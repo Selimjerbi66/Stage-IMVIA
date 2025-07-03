@@ -1,0 +1,19 @@
+This doc will have the the basic mathematical solutions behind the work we are doing.
+Each math problem will be resolved and in the file mathAlg.py, you will find the algorithm on which we based the solution.
+The parts of this doc will be structured as follows:
+- Name of the math problem
+- Description
+- Math equations and solutions
+
+1. Room:
+The rooms, which designate the offices, the labs, or even the hallway, are all rectangular in shape. We will work on the plane (x,y,0). with the point (0,0) being the reference and the extreme down left point. To build the room, we will take the parameters (length,width). The unit will be in divs, with 1 div corresponding to 0.1 meters(to be updated)
+length = length
+width = width
+1.1. Area:
+A part of the room class. It is not clear how useful it is but we'll see about that.
+area = length * width
+1.2. Walls:
+A wall is a part of the room class. A wall is intended to be a limiter for the camera's field of vision. it will be modelized by the parameters (x1,y1) and (x2,y2) to define the line segment. The points have to be inside the room area otherwise it will not work.
+To simplify modelization, we will create a wall class to stock the wall's parameters. There will also be a function to check if the points are within the room area.
+first point : x1 = x1 ; y1 = y1
+second point : x2 = x2 ; y2 = y2
