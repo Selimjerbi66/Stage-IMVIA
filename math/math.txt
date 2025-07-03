@@ -12,8 +12,19 @@ width = width
 1.1. Area:
 A part of the room class. It is not clear how useful it is but we'll see about that.
 area = length * width
-1.2. Walls:
+1.2. Points:
+the points are all the positions available in the room. they have the coordinates (x,y)
+x = x
+y = y
+1.3. Walls:
 A wall is a part of the room class. A wall is intended to be a limiter for the camera's field of vision. it will be modelized by the parameters (x1,y1) and (x2,y2) to define the line segment. The points have to be inside the room area otherwise it will not work.
 To simplify modelization, we will create a wall class to stock the wall's parameters. There will also be a function to check if the points are within the room area.
 first point : x1 = x1 ; y1 = y1
 second point : x2 = x2 ; y2 = y2
+1.4 Camera:
+The camera has the following parameters : the postion (x,y), the orientation of the camera compared to the x-axis (angle in degrees), the angle of sight of the camera (angle in degrees), and the reach of the camera.
+we will create a camera class to stock the parameters
+the orientation is the bissector of the angle of sight. For example, if the orientation is 0 degree, the camera is oriented the right. if the angle of sight is 90 degrees, that means the field of vision is 45 degrees under the orientation axis (in this case the right because the camera orientation was 0) and 45 degrees over it. The field of vission will be a circular circle.
+we will also have a function in the class to calculate the area of the field of vision and another to detect the points of the room that should be seen by the camera (considering the existance of the walls).
+2. Point Matrix:
+we will create a matrix with corresponds each point with the number of cameras pointing at it and the list of cameras pointing at it.
