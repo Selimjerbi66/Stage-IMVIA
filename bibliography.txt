@@ -1,0 +1,14 @@
+In this project, we used:
+
+- The following libraries:
+    - math
+        - No installation command needed (part of the Python Standard Library).
+    - json
+        - No installation command needed (part of the Python Standard Library).
+
+- The following program:
+    - PyQt6
+        - Installation command:
+        ```bash
+        pip install PyQt6
+        ```

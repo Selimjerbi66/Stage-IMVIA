@@ -38,7 +38,7 @@ def convert_json_to_list_of_lists(json_file):
     return result
 '''
 # Example usage
-json_file_path = 'files\example.json'
+json_file_path = 'files\lab.json'
 converted_data = convert_json_to_list_of_lists(json_file_path)
 print(json.dumps(converted_data, indent=4))
 '''
