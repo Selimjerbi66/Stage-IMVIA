@@ -1,0 +1,5 @@
+The file has to contain the room shape, the list of walls with their dimensions, the list of cameras with their attributes (position, orientation and angle of vision and reach).
+Those information could be presented as a list of rooms inside the same file.
+We will use the json format for its simple and practicle usability.
+You will find in this same folder the file example.json
+To read it, will will use the python library called json to convert the lines into appropriate dictionaries.

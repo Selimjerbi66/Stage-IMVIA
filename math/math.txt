@@ -28,3 +28,6 @@ the orientation is the bissector of the angle of sight. For example, if the orie
 we will also have a function in the class to calculate the area of the field of vision and another to detect the points of the room that should be seen by the camera (considering the existance of the walls).
 2. Point Matrix:
 we will create a matrix with corresponds each point with the number of cameras pointing at it and the list of cameras pointing at it.
+
+
+Each of the new objects will have a names as one of its parameters, including the room.

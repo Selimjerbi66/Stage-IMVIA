@@ -1,7 +1,8 @@
 import math
 
 class Room:
-    def __init__(self, length, width, walls=None, cameras=None):
+    def __init__(self, name, length, width, walls=None, cameras=None):
+        self.name = name
         self.length = length
         self.width = width
         self.walls = walls if walls is not None else []
@@ -102,7 +103,8 @@ class Room:
 
 
 class Wall:
-    def __init__(self, x1, y1, x2, y2):
+    def __init__(self, name, x1, y1, x2, y2):
+        self.name = name
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -113,7 +115,8 @@ class Wall:
 
 
 class Camera:
-    def __init__(self, x, y, orientation, angle_of_sight, reach):
+    def __init__(self, name, x, y, orientation, angle_of_sight, reach):
+        self.name = name
         self.x = x
         self.y = y
         self.orientation = orientation
