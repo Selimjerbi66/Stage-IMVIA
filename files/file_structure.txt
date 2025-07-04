@@ -2,4 +2,4 @@ The file has to contain the room shape, the list of walls with their dimensions,
 Those information could be presented as a list of rooms inside the same file.
 We will use the json format for its simple and practicle usability.
 You will find in this same folder the file example.json
-To read it, will will use the python library called json to convert the lines into appropriate dictionaries.
+To read it, will will use the python library called json to convert the lines into appropriate dictionaries. Then, we will create a matrix with all the information.
