@@ -1,5 +1,5 @@
 from mathematical.mathAlg import *
-from files.file_reader import *
+from files.trash.file_reader import *
 def buildLab(matrix):
     rooms=[]
     for room in matrix:

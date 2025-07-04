@@ -3,51 +3,24 @@ Those information could be presented as a list of rooms inside the same file.
 We will use the json format for its simple and practicle usability.
 You will find in this same folder the file example.json
 To read it, will will use the python library called json to convert the lines into appropriate dictionaries. Then, we will create a matrix with all the information.
-The matrix must have this form after reading the example.json:
-[
-    [room1,
-    [length,width],
-    [
-        [wall1,x1,y1,x2,y2],
-        [wall2,x1,y1,x2,y2],
-        [wall3,x1,y1,x2,y2]
-    ],
-    [
-        [camera1,x,y,orientation,angle,reach],
-        [camera2,x,y,orientation,angle,reach],
-        [camera3,x,y,orientation,angle,reach]
-    ]
-    ],
-    [room2,
-    [length,width],
-    [
-        [wall1,x1,y1,x2,y2],
-        [wall2,x1,y1,x2,y2],
-        [wall3,x1,y1,x2,y2]
-    ],
-    [
-        [camera1,x,y,orientation,angle,reach],
-        [camera2,x,y,orientation,angle,reach],
-        [camera3,x,y,orientation,angle,reach]
-    ]
-    ],
-    [room3,
-    [length,width],
-    [
-        [wall1,x1,y1,x2,y2],
-        [wall2,x1,y1,x2,y2],
-        [wall3,x1,y1,x2,y2]
-    ],
-    [
-        [camera1,x,y,orientation,angle,reach],
-        [camera2,x,y,orientation,angle,reach],
-        [camera3,x,y,orientation,angle,reach]
-    ]
-    ],
+The matrix must have this form after reading the roomexp.json:
 
+[
+    room,
+    [length,width],
+    [
+        [wall1,x1,y1,x2,y2],
+        [wall2,x1,y1,x2,y2],
+        [wall3,x1,y1,x2,y2]
+    ]
 ]
 
-
+and the camera list will have this form : cameraexp.json
+[
+        [camera1,x,y,orientation,angle,reach],
+        [camera2,x,y,orientation,angle,reach],
+        [camera3,x,y,orientation,angle,reach]
+]
 
 
 sidequest(later in the project): create the appropriate program to add cameras, walls and even rooms to the json file.

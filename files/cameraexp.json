@@ -1,0 +1,76 @@
+{
+    "cameras": [
+        {
+            "camera1": {
+                "x": "20",
+                "y": "30",
+                "orientation": "0",
+                "angle": "40",
+                "reach": "25"
+            }
+        },
+        {
+            "camera2": {
+                "x": "40",
+                "y": "50",
+                "orientation": "45",
+                "angle": "35",
+                "reach": "30"
+            }
+        },
+        {
+            "camera3": {
+                "x": "300",
+                "y": "200",
+                "orientation": "100",
+                "angle": "60",
+                "reach": "30"
+            }
+        },
+        {
+            "camera4": {
+                "x": "150",
+                "y": "250",
+                "orientation": "90",
+                "angle": "50",
+                "reach": "40"
+            }
+        },
+        {
+            "camera5": {
+                "x": "250",
+                "y": "350",
+                "orientation": "180",
+                "angle": "70",
+                "reach": "35"
+            }
+        },
+        {
+            "camera6": {
+                "x": "400",
+                "y": "400",
+                "orientation": "270",
+                "angle": "80",
+                "reach": "50"
+            }
+        },
+        {
+            "camera7": {
+                "x": "600",
+                "y": "150",
+                "orientation": "315",
+                "angle": "60",
+                "reach": "30"
+            }
+        },
+        {
+            "camera8": {
+                "x": "700",
+                "y": "250",
+                "orientation": "225",
+                "angle": "75",
+                "reach": "45"
+            }
+        }
+    ]
+}
