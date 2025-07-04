@@ -19,11 +19,9 @@ def process_room_file(file_path):
     for wall in walls:
         for wall_key, coordinates in wall.items():
             output[2].append([wall_key, coordinates['x1'], coordinates['y1'], coordinates['x2'], coordinates['y2']])
-
     return output
-'''
+
 # Example usage
 json_file_path = "roomexp.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 print(result)
-'''
