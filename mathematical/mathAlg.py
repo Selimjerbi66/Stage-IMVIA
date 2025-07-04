@@ -1,33 +1,15 @@
 import math
 
 class Room:
-    def __init__(self, name, length, width, walls=None, cameras=None):
+    def __init__(self, name, length, width, walls=None,):
         self.name = name
         self.length = length
         self.width = width
         self.walls = walls if walls is not None else []
-        self.cameras = cameras if cameras is not None else []
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
-        self.matrix = {}  # Initialize the matrix as empty
-
+        self.matrix = {}
     def area(self):
         return self.length * self.width
-
-    def add_wall(self, x1, y1, x2, y2):
-        if self.is_within_bounds(x1, y1) and self.is_within_bounds(x2, y2):
-            wall = Wall(x1, y1, x2, y2)
-            self.walls.append(wall)
-        else:
-            raise ValueError("Wall points must be within the room boundaries.")
-
-    def add_camera(self, camera):
-        if self.is_within_bounds(camera.x, camera.y):
-            self.cameras.append(camera)
-        else:
-            raise ValueError("Camera position must be within the room boundaries.")
-
-    def is_within_bounds(self, x, y):
-        return 0 <= x <= self.length and 0 <= y <= self.width
 
     def visible_points_by_camera(self, camera):
         visible = []
@@ -82,7 +64,7 @@ class Room:
     def on_segment(self, px, py, qx, qy, rx, ry):
         return min(px, qx) <= rx <= max(px, qx) and min(py, qy) <= ry <= max(py, qy)
 
-    def point_matrix(self):
+    def point_matrix(self, cameras):
         self.matrix = {}
         
         for point in self.points:
@@ -91,7 +73,7 @@ class Room:
                 'cameras': []
             }
         
-        for camera in self.cameras:
+        for camera in cameras:
             for point in self.points:
                 if self.is_visible(camera, point):
                     self.matrix[point]['camera_count'] += 1
