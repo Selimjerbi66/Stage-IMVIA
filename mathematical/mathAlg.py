@@ -118,8 +118,13 @@ class Room:
                 test=False
         for camera in cameras:
             for wall in self.walls:
-                if wall.point_on_segment(self, camera.x, camera.y)==False:
-                    return False
+                if wall.thickness == None:
+                    if wall.point_on_segment(self, camera.x, camera.y)==True:
+                        return False
+                else:
+                    if wall.point_on_rectangle(self, camera.x, camera.y)==True:
+                        return False
+
         return test
 
 
@@ -129,12 +134,18 @@ class Room:
 
 
 class Wall:
-    def __init__(self, name, x1, y1, x2, y2):
+    def __init__(self, name, x1, y1, x2, y2, thickness=None):
         self.name = name
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
+        self.thickness = thickness
+        # Calculate corners of the rectangle
+        if thickness !=None:
+            
+            self.x3, self.y3, self.x4, self.y4, self.x5, self.y5, self.x6, self.y6 = calculate_corners(x1, y1, x2, y2, thickness)
+
     def point_on_segment(self, px, py):
         area = (self.y2 - self.y1) * (px - self.x1) - (self.x2 - self.x1) * (py - self.y1)
 
@@ -145,10 +156,54 @@ class Wall:
             return True
 
         return False
+    def point_on_rectangle(self, px, py):
+    # Create a list of corners
+        corners = [
+        (self.x3, self.y3),  # Top-left
+        (self.x4, self.y4),  # Top-right
+        (self.x6, self.y6),  # Bottom-right
+        (self.x5, self.y5),  # Bottom-left
+        ]
+
+    # Use the ray-casting algorithm to check if the point is inside the polygon
+        inside = False
+        n = len(corners)
     
+        for i in range(n):
+            x1, y1 = corners[i]
+            x2, y2 = corners[(i + 1) % n]
+        
+        # Check if the point is within the y-bounds of the edge
+            if ((y1 > py) != (y2 > py)) and (px < (x2 - x1) * (py - y1) / (y2 - y1) + x1):
+                inside = not inside
+
+        return inside
     def __str__(self):
         return f"{self.name} from ({self.x1}, {self.y1}) to ({self.x2}, {self.y2})"
+def calculate_corners(x1, y1, x2, y2, thickness):
+    # Calculate the angle of the wall
+        dx = x2 - x1
+        dy = y2 - y1
+        angle = math.atan2(dy, dx)
 
+        # Calculate the half thickness offset
+        half_thickness = thickness / 2
+
+        # Calculate the offsets using the angle
+        offset_x = half_thickness * math.cos(angle + math.pi / 2)  # Perpendicular direction
+        offset_y = half_thickness * math.sin(angle + math.pi / 2)
+
+        # Calculate the corners of the rectangle
+        x3 = x1 + offset_x
+        y3 = y1 + offset_y
+        x4 = x2 + offset_x
+        y4 = y2 + offset_y
+        x5 = x1 - offset_x
+        y5 = y1 - offset_y
+        x6 = x2 - offset_x
+        y6 = y2 - offset_y
+
+        return x3, y3, x4, y4, x5, y5, x6, y6
 
 class Camera:
     def __init__(self, name, x, y, orientation, angle_of_sight, range):
