@@ -5,12 +5,43 @@ class Room:
         self.name = name
         self.length = length
         self.width = width
-        self.walls = walls if walls is not None else []
+        self.walls = [
+            Wall(0, 0, length, 0),      # Bottom wall
+            Wall(length, 0, length, width),  # Right wall
+            Wall(length, width, 0, width),   # Top wall
+            Wall(0, width, 0, 0)           # Left wall
+        ]
+        if walls is not None:
+            self.walls.extend(walls)  # Add additional walls if provided
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
         self.matrix = {}
     def area(self):
         return self.length * self.width
+    def area_of_field_of_vision(self, camera):
+        left_angle, right_angle = camera.get_field_of_view()
+        visible_area = 0
+        for wall in self.walls:
+            if self.line_intersects(camera.x, camera.y, 
+                                    camera.x + camera.reach * math.cos(math.radians(left_angle)), 
+                                    camera.y + camera.reach * math.sin(math.radians(left_angle)), 
+                                    wall.x1, wall.y1, wall.x2, wall.y2):
+                # Calculate intersection points and visible area
+                # This will require calculating the intersection points 
+                # and possibly creating a polygon of the visible area.
+                # For simplicity, assume we calculate the area directly.
+                # More complex logic could be added here to handle the polygon.
+                intersection_x1 = camera.x + camera.reach * math.cos(math.radians(left_angle))
+                intersection_y1 = camera.y + camera.reach * math.sin(math.radians(left_angle))
+                intersection_x2 = camera.x + camera.reach * math.cos(math.radians(right_angle))
+                intersection_y2 = camera.y + camera.reach * math.sin(math.radians(right_angle))
+                
+                # Calculate area of the triangle formed by the camera and intersection points
+                triangle_area = 0.5 * abs(camera.x * (intersection_y1 - intersection_y2) +
+                                           intersection_x1 * (intersection_y2 - camera.y) +
+                                           intersection_x2 * (camera.y - intersection_y1))
+                visible_area += triangle_area
 
+        return visible_area
     def visible_points_by_camera(self, camera):
         visible = []
         for point in self.points:
@@ -135,9 +166,6 @@ class Camera:
         right_angle = self.orientation + half_sight
         return left_angle, right_angle
 
-    def area_of_field_of_vision(self):
-        radius = self.reach
-        return math.pi * (radius ** 2)
 
     def __str__(self):
         return (f"{self.name}(position=({self.x}, {self.y}), "
