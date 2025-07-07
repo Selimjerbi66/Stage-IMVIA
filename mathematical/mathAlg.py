@@ -6,10 +6,10 @@ class Room:
         self.length = int(length)
         self.width = int(width)
         self.walls = [
-            Wall("side1", 0, 0, length, 0, None),      # Bottom wall
-            Wall("side2",length, 0, length, width, None),  # Right wall
-            Wall("side3",length, width, 0, width, None),   # Top wall
-            Wall("side4",0, width, 0, 0, None)           # Left wall
+            Wall("side1", 0, 0, length, 0, 0),      # Bottom wall
+            Wall("side2",length, 0, length, width, 0),  # Right wall
+            Wall("side3",length, width, 0, width, 0),   # Top wall
+            Wall("side4",0, width, 0, 0, 0)           # Left wall
         ]
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
@@ -56,7 +56,7 @@ class Room:
             return False
 
         for wall in self.walls:
-            if wall.thickness is None:
+            if wall.thickness == 0:
 
                 if self.line_intersects(camera.x, camera.y, x, y, wall.x1, wall.y1, wall.x2, wall.y2):
                     return False
@@ -138,7 +138,7 @@ class Room:
                 test=False
         for camera in cameras:
             for wall in self.walls:
-                if wall.thickness is None:
+                if wall.thickness == 0:
                     if wall.point_on_segment(self, camera.x, camera.y)==True:
                         return False
                 else:
@@ -154,15 +154,16 @@ class Room:
 
 
 class Wall:
-    def __init__(self, name, x1, y1, x2, y2, thickness=None):
+    def __init__(self, name, x1, y1, x2, y2, thickness=0):
         self.name = name
         self.x1 = int(x1)
         self.y1 = int(y1)
         self.x2 = int(x2)
         self.y2 = int(y2)
-        self.thickness = thickness
+        if thickness ==0 :
+            self.thickness = int(thickness)
         # Calculate corners of the rectangle
-        if thickness !=None:
+        if thickness !=0:
             
             self.x3, self.y3, self.x4, self.y4, self.x5, self.y5, self.x6, self.y6 = calculate_corners(x1, y1, x2, y2, thickness)
 

@@ -7,7 +7,10 @@ room = setUpLab(result)
 plt.figure(figsize=(room.length,room.width))
 for i in range(len(room.walls)):
     print(room.walls[i])
-    plt.plot([room.walls[i].x1,room.walls[i].x2],[room.walls[i].y1,room.walls[i].y2], label = room.walls[i].name)
+    if room.walls[i].thickness > 0 :
+        plt.plot([room.walls[i].x1,room.walls[i].x2],[room.walls[i].y1,room.walls[i].y2], linewidth = room.walls[i].thickness, label = room.walls[i].name)
+    else:
+        plt.plot([room.walls[i].x1,room.walls[i].x2],[room.walls[i].y1,room.walls[i].y2], label = room.walls[i].name)
 
 
 # Set limits for the x-axis and y-axis
