@@ -15,7 +15,7 @@ def process_cameras_file(file_path):
                 attributes['y'],
                 attributes['orientation'],
                 attributes['angle'],
-                attributes['reach']
+                attributes['range']
             ])
 
     return output

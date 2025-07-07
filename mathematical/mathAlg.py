@@ -21,18 +21,18 @@ class Room:
         visible_area = 0
         for wall in self.walls:
             if self.line_intersects(camera.x, camera.y, 
-                                    camera.x + camera.reach * math.cos(math.radians(left_angle)), 
-                                    camera.y + camera.reach * math.sin(math.radians(left_angle)), 
+                                    camera.x + camera.range * math.cos(math.radians(left_angle)), 
+                                    camera.y + camera.range * math.sin(math.radians(left_angle)), 
                                     wall.x1, wall.y1, wall.x2, wall.y2):
                 # Calculate intersection points and visible area
                 # This will require calculating the intersection points 
                 # and possibly creating a polygon of the visible area.
                 # For simplicity, assume we calculate the area directly.
                 # More complex logic could be added here to handle the polygon.
-                intersection_x1 = camera.x + camera.reach * math.cos(math.radians(left_angle))
-                intersection_y1 = camera.y + camera.reach * math.sin(math.radians(left_angle))
-                intersection_x2 = camera.x + camera.reach * math.cos(math.radians(right_angle))
-                intersection_y2 = camera.y + camera.reach * math.sin(math.radians(right_angle))
+                intersection_x1 = camera.x + camera.range * math.cos(math.radians(left_angle))
+                intersection_y1 = camera.y + camera.range * math.sin(math.radians(left_angle))
+                intersection_x2 = camera.x + camera.range * math.cos(math.radians(right_angle))
+                intersection_y2 = camera.y + camera.range * math.sin(math.radians(right_angle))
                 
                 # Calculate area of the triangle formed by the camera and intersection points
                 triangle_area = 0.5 * abs(camera.x * (intersection_y1 - intersection_y2) +
@@ -51,7 +51,7 @@ class Room:
     def is_visible(self, camera, point):
         x, y = point
         distance = math.hypot(x - camera.x, y - camera.y)
-        if distance > camera.reach:
+        if distance > camera.range:
             return False
 
         for wall in self.walls:
@@ -151,13 +151,13 @@ class Wall:
 
 
 class Camera:
-    def __init__(self, name, x, y, orientation, angle_of_sight, reach):
+    def __init__(self, name, x, y, orientation, angle_of_sight, range):
         self.name = name
         self.x = x
         self.y = y
         self.orientation = orientation
         self.angle_of_sight = angle_of_sight
-        self.reach = reach
+        self.range = range
 
     def get_field_of_view(self):
         half_sight = self.angle_of_sight / 2
@@ -170,14 +170,14 @@ class Camera:
         return (f"{self.name}(position=({self.x}, {self.y}), "
                 f"orientation={self.orientation}°, "
                 f"angle_of_sight={self.angle_of_sight}°, "
-                f"reach={self.reach})")
+                f"range={self.range})")
 
 '''
 # Example usage
 walls = [Wall(10, 10, 90, 10)]
 cameras = [
-    Camera(x=20, y=20, orientation=0, angle_of_sight=90, reach=30),
-    Camera(x=80, y=40, orientation=180, angle_of_sight=90, reach=25)
+    Camera(x=20, y=20, orientation=0, angle_of_sight=90, range=30),
+    Camera(x=80, y=40, orientation=180, angle_of_sight=90, range=25)
 ]
 
 my_room = Room(length=100, width=50, walls=walls, cameras=cameras)
