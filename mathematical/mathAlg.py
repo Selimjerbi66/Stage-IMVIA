@@ -154,14 +154,13 @@ class Room:
 
 
 class Wall:
-    def __init__(self, name, x1, y1, x2, y2, thickness=0):
+    def __init__(self, name, x1, y1, x2, y2, thickness):
         self.name = name
         self.x1 = int(x1)
         self.y1 = int(y1)
         self.x2 = int(x2)
         self.y2 = int(y2)
-        if thickness ==0 :
-            self.thickness = int(thickness)
+        self.thickness = int(thickness)
         # Calculate corners of the rectangle
         if thickness !=0:
             

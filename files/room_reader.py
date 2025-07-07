@@ -4,14 +4,17 @@ def process_room_file(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
 
-    room_data = data['room']
+    # Find the first key in the data dictionary (assuming only one key for the room)
+    room_key = next(iter(data))
+    room_data = data[room_key]
+    
     length = int(room_data['length'])  # Convert length to int
     width = int(room_data['width'])    # Convert width to int
     walls = room_data['walls']
 
     # Create the desired output format
     output = [
-        "room",
+        room_key,                       # Use the dynamic room key
         [length, width],
         []
     ]
@@ -28,7 +31,6 @@ def process_room_file(file_path):
             ])
     
     return output
-
 '''
 # Example usage
 json_file_path = "roomexp.json"  # Replace with your JSON file path

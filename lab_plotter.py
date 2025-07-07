@@ -18,7 +18,7 @@ plt.xlim(0, room.length)  # Set x-axis limit
 plt.ylim(0, room.width + 1)  # Set y-axis limit
 
 # Add labels and titles
-plt.title("Line Segment between Two Points")
+plt.title(room.name)
 plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
 
