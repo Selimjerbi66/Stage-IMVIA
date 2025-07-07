@@ -28,8 +28,9 @@ def process_room_file(file_path):
             ])
     
     return output
-
+'''
 # Example usage
 json_file_path = "roomexp.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 print(result)
+'''
