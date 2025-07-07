@@ -12,3 +12,8 @@ In this project, we used:
         ```bash
         pip install PyQt6
         ```
+    - MatPlotLbi
+        - Installation command:
+        ```bash
+        pip install matplotlib
+        ```
