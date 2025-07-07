@@ -18,7 +18,15 @@ def process_room_file(file_path):
 
     for wall in walls:
         for wall_key, coordinates in wall.items():
-            output[2].append([wall_key, coordinates['x1'], coordinates['y1'], coordinates['x2'], coordinates['y2']])
+            output[2].append([
+                wall_key,
+                coordinates['x1'],
+                coordinates['y1'],
+                coordinates['x2'],
+                coordinates['y2'],
+                coordinates['thickness']
+            ])
+    
     return output
 
 # Example usage

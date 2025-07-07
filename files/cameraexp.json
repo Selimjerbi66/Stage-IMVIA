@@ -6,7 +6,7 @@
                 "y": "30",
                 "orientation": "0",
                 "angle": "40",
-                "reach": "25"
+                "range": "25"
             }
         },
         {
@@ -15,7 +15,7 @@
                 "y": "50",
                 "orientation": "45",
                 "angle": "35",
-                "reach": "30"
+                "range": "30"
             }
         },
         {
@@ -24,7 +24,7 @@
                 "y": "200",
                 "orientation": "100",
                 "angle": "60",
-                "reach": "30"
+                "range": "30"
             }
         },
         {
@@ -33,7 +33,7 @@
                 "y": "250",
                 "orientation": "90",
                 "angle": "50",
-                "reach": "40"
+                "range": "40"
             }
         },
         {
@@ -42,7 +42,7 @@
                 "y": "350",
                 "orientation": "180",
                 "angle": "70",
-                "reach": "35"
+                "range": "35"
             }
         },
         {
@@ -51,7 +51,7 @@
                 "y": "400",
                 "orientation": "270",
                 "angle": "80",
-                "reach": "50"
+                "range": "50"
             }
         },
         {
@@ -60,7 +60,7 @@
                 "y": "150",
                 "orientation": "315",
                 "angle": "60",
-                "reach": "30"
+                "range": "30"
             }
         },
         {
@@ -69,7 +69,7 @@
                 "y": "250",
                 "orientation": "225",
                 "angle": "75",
-                "reach": "45"
+                "range": "45"
             }
         }
     ]

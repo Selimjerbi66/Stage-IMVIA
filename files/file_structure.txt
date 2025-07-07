@@ -9,9 +9,9 @@ The matrix must have this form after reading the roomexp.json:
     room,
     [length,width],
     [
-        [wall1,x1,y1,x2,y2],
-        [wall2,x1,y1,x2,y2],
-        [wall3,x1,y1,x2,y2]
+        [wall1,x1,y1,x2,y2,thickness],
+        [wall2,x1,y1,x2,y2,thickness],
+        [wall3,x1,y1,x2,y2,thickness]
     ]
 ]
 
