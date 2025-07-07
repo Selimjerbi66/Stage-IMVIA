@@ -3,13 +3,13 @@ import math
 class Room:
     def __init__(self, name, length, width, walls=None):
         self.name = name
-        self.length = length
-        self.width = width
+        self.length = int(length)
+        self.width = int(width)
         self.walls = [
-            Wall(0, 0, length, 0, None),      # Bottom wall
-            Wall(length, 0, length, width, None),  # Right wall
-            Wall(length, width, 0, width, None),   # Top wall
-            Wall(0, width, 0, 0, None)           # Left wall
+            Wall("side1", 0, 0, length, 0, None),      # Bottom wall
+            Wall("side2",length, 0, length, width, None),  # Right wall
+            Wall("side3",length, width, 0, width, None),   # Top wall
+            Wall("side4",0, width, 0, 0, None)           # Left wall
         ]
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
@@ -150,16 +150,16 @@ class Room:
 
     def __str__(self):
         return (f"Room(length={self.length}, width={self.width}, "
-                f"area={self.area()}, walls={len(self.walls)}, cameras={len(self.cameras)})")
+                f"area={self.area()}, walls={len(self.walls)})")
 
 
 class Wall:
     def __init__(self, name, x1, y1, x2, y2, thickness=None):
         self.name = name
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+        self.x1 = int(x1)
+        self.y1 = int(y1)
+        self.x2 = int(x2)
+        self.y2 = int(y2)
         self.thickness = thickness
         # Calculate corners of the rectangle
         if thickness !=None:
