@@ -1,7 +1,7 @@
 import math
 
 class Room:
-    def __init__(self, name, length, width, walls=None,):
+    def __init__(self, name, length, width, walls=None):
         self.name = name
         self.length = length
         self.width = width
