@@ -11,16 +11,10 @@ def setUpLab(matrix):
         x+=1
     Room(matrix[0],matrix[1][0],matrix[1][1],Walls)
     print(Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls))
-    return Room
+    return Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls)
 def setUpCameras(matrix):
     Cameras=[]
     for i in matrix:
         Cameras.append(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
         print(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
-def buildLab(room_json_path, cameras_json_path):
-    room_list = process_room_file(room_json_path)
-    cameras_list = process_cameras_file(cameras_json_path)
-    setUpLab(room_list)
-    setUpCameras(cameras_list)
-
-buildLab("roomexp.json","files\cameraexp.json")
+    return Cameras
