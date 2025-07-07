@@ -14,7 +14,6 @@ class Room:
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
-        self.matrix = {}
     def area(self):
         return self.length * self.width
     def area_of_field_of_vision(self, camera):
@@ -96,10 +95,10 @@ class Room:
         return min(px, qx) <= rx <= max(px, qx) and min(py, qy) <= ry <= max(py, qy)
 
     def point_matrix(self, cameras):
-        self.matrix = {}
+        matrix = {}
         
         for point in self.points:
-            self.matrix[point] = {
+            matrix[point] = {
                 'camera_count': 0,
                 'cameras': []
             }
@@ -107,9 +106,9 @@ class Room:
         for camera in cameras:
             for point in self.points:
                 if self.is_visible(camera, point):
-                    self.matrix[point]['camera_count'] += 1
-                    self.matrix[point]['cameras'].append(camera)
-        return self.matrix
+                    matrix[point]['camera_count'] += 1
+                    matrix[point]['cameras'].append(camera)
+        return matrix
     def compatibleCameraSet(self, cameras):
         test = True
         i=0
