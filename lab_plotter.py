@@ -20,7 +20,7 @@ plt.xlabel("X-axis")
 plt.ylabel("Y-axis")
 
 # Show grid
-plt.grid()
+#plt.grid()
 
 # Display the plot
 plt.show()
