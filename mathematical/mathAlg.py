@@ -101,7 +101,17 @@ class Wall:
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
+    def point_on_segment(self, px, py):
+        area = (self.y2 - self.y1) * (px - self.x1) - (self.x2 - self.x1) * (py - self.y1)
 
+        if area != 0:
+            return False
+
+        if min(self.x1, self.x2) <= px <= max(self.x1, self.x2) and min(self.y1, self.y2) <= py <= max(self.y1, self.y2):
+            return True
+
+        return False
+    
     def __str__(self):
         return f"{self.name} from ({self.x1}, {self.y1}) to ({self.x2}, {self.y2})"
 
