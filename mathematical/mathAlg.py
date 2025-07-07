@@ -6,17 +6,17 @@ class Room:
         self.length = length
         self.width = width
         self.walls = [
-            Wall(0, 0, length, 0),      # Bottom wall
-            Wall(length, 0, length, width),  # Right wall
-            Wall(length, width, 0, width),   # Top wall
-            Wall(0, width, 0, 0)           # Left wall
+            Wall(0, 0, length, 0, None),      # Bottom wall
+            Wall(length, 0, length, width, None),  # Right wall
+            Wall(length, width, 0, width, None),   # Top wall
+            Wall(0, width, 0, 0, None)           # Left wall
         ]
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
     def area(self):
         return self.length * self.width
-    def area_of_field_of_vision(self, camera):
+    '''def area_of_field_of_vision(self, camera):
         left_angle, right_angle = camera.get_field_of_view()
         visible_area = 0
         for wall in self.walls:
@@ -40,7 +40,8 @@ class Room:
                                            intersection_x2 * (camera.y - intersection_y1))
                 visible_area += triangle_area
 
-        return visible_area
+        return visible_area'''
+    
     def visible_points_by_camera(self, camera):
         visible = []
         for point in self.points:
@@ -55,9 +56,14 @@ class Room:
             return False
 
         for wall in self.walls:
-            if self.line_intersects(camera.x, camera.y, x, y, wall.x1, wall.y1, wall.x2, wall.y2):
-                return False
+            if wall.thickness is None:
 
+                if self.line_intersects(camera.x, camera.y, x, y, wall.x1, wall.y1, wall.x2, wall.y2):
+                    return False
+            else:
+                if self.line_intersects_rectangle(camera.x, camera.y, x, y, wall):
+                    return False
+                
         angle_to_point = self.calculate_angle(camera, point)
         left_angle, right_angle = camera.get_field_of_view()
 
@@ -72,7 +78,21 @@ class Room:
 
     def calculate_angle(self, camera, point):
         return math.degrees(math.atan2(point[1] - camera.y, point[0] - camera.x))
-
+    def line_intersects_rectangle(self, xl1, yl1, xl2, yl2, wall):
+        # Define the rectangle sides using the wall's corners
+        sides = [
+            (wall.x3, wall.y3, wall.x4, wall.y4),  # Top side
+            (wall.x4, wall.y4, wall.x6, wall.y6),  # Right side
+            (wall.x6, wall.y6, wall.x5, wall.y5),  # Bottom side
+            (wall.x5, wall.y5, wall.x3, wall.y3),  # Left side
+        ]
+        
+        # Check each side for intersection
+        for (sx1, sy1, sx2, sy2) in sides:
+            if self.line_intersects(xl1, yl1, xl2, yl2, sx1, sy1, sx2, sy2):
+                return True
+        
+        return False
     def line_intersects(self, x1, y1, x2, y2, x3, y3, x4, y4):
         denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
 
@@ -118,7 +138,7 @@ class Room:
                 test=False
         for camera in cameras:
             for wall in self.walls:
-                if wall.thickness == None:
+                if wall.thickness is None:
                     if wall.point_on_segment(self, camera.x, camera.y)==True:
                         return False
                 else:
