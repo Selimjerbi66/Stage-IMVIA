@@ -6,8 +6,8 @@ def setUpLab(matrix):
     x=0
     for i in matrix[2]:
         print (x)
-        Walls.append(Wall(i[0],i[1],i[2],i[3],i[4]))
-        print(Wall(i[0],i[1],i[2],i[3],i[4]))
+        Walls.append(Wall(i[0],i[1],i[2],i[3],i[4],i[5]))
+        print(Wall(i[0],i[1],i[2],i[3],i[4],i[5]))
         x+=1
     Room(matrix[0],matrix[1][0],matrix[1][1],Walls)
     print(Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls))
