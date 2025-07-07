@@ -78,6 +78,16 @@ class Room:
                 if self.is_visible(camera, point):
                     self.matrix[point]['camera_count'] += 1
                     self.matrix[point]['cameras'].append(camera)
+        return self.matrix
+    def compatibleCameraSet(self, cameras):
+        test = True
+        i=0
+        while test and i<len(cameras):
+            camera=cameras[i]
+            if not(0<=camera.x<=self.length and 0<=camera.y<=self.width):
+                test=False
+        return test
+
 
     def __str__(self):
         return (f"Room(length={self.length}, width={self.width}, "
