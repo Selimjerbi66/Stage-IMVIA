@@ -86,6 +86,10 @@ class Room:
             camera=cameras[i]
             if not(0<=camera.x<=self.length and 0<=camera.y<=self.width):
                 test=False
+        for camera in cameras:
+            for wall in self.walls:
+                if wall.point_on_segment(self, camera.x, camera.y)==False:
+                    return False
         return test
 
 
