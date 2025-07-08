@@ -133,12 +133,8 @@ class Room:
                 test=False
         for camera in cameras:
             for wall in self.walls:
-                if wall.thickness == 0:
-                    if wall.point_on_segment(self, camera.x, camera.y)==True:
-                        return False
-                else:
-                    if wall.point_on_rectangle(self, camera.x, camera.y)==True:
-                        return False
+                if wall.point_on_rectangle(self, camera.x, camera.y)==True:
+                    return False
 
         return test
 
