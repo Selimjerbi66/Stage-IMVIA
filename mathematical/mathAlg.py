@@ -70,9 +70,7 @@ class Room:
     # Calculate rectangle corners based on bottom-left corner, length, and width
         xbl, ybl = wall.xbl, wall.ybl
         xbr = xbl + wall.length  # Bottom-right corner
-        ybr = ybl                # Bottom-right corner y-coordinate
         ytl = ybl + wall.width   # Top-left corner y-coordinate
-        ytr = ytl                # Top-right corner y-coordinate
 
     # Define the rectangle sides using the calculated corners
         sides = [

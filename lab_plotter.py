@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt  # Importer la bibliothèque pyplot de matplotli
 import matplotlib.patches as patches
 import numpy as np  # Importer numpy pour la manipulation de tableaux numériques
 from lab_builder import *
+from mathematical.camfield import *
 hex_codes = [
     '#000000',  # Black (lowest intensity)
     '#0000FF',  # Blue
@@ -35,19 +36,18 @@ for i in range(len(room.walls)):
     # Add the rectangle patch to the axes
     ax.add_patch(rectangle)
 cameras = setUpCameras(process_cameras_file("cameraexp.json"))
-matrix = room.point_matrix(cameras)
 # Loop through each point in the matrix
-for (x, y), data in matrix.items():
-    camera_count = data['camera_count']
-    # Ensure the camera_count does not exceed the length of hex_codes
-    if camera_count < len(hex_codes):
-        color = hex_codes[camera_count]  # Select the color based on camera count
-    else:
-        color = hex_codes[-1]  # Use the last color if the count exceeds available colors
+for i , camera in enumerate(cameras):
+    points=outlineView(room.visible_points_by_camera(camera))
+    print(i)
+    print(points)
+    if points:
+    # Create a polygon from the points
+        polygon = patches.Polygon(points, closed=True, facecolor=hex_codes[2], edgecolor=hex_codes[3], linewidth=1)
+    
+    # Add the polygon to your plot (assuming you have an `ax` defined)
+        ax.add_patch(polygon)
 
-    # Plot the point with a small size
-    ax.scatter(x, y, color=color, s=10)  # Set size to 10 for small points
-print(len(matrix))
 # Set limits for the x-axis and y-axis
 ax.set_xlim(-1, room.length + 1)  # X-axis limits
 ax.set_ylim(-1, room.width + 1)# Y-axis limits
