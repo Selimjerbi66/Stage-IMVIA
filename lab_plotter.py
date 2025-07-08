@@ -35,7 +35,7 @@ for i in range(len(room.walls)):
 
     # Add the rectangle patch to the axes
     ax.add_patch(rectangle)
-cameras = setUpCameras(process_cameras_file("cameraexp.json"))
+cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
 # Loop through each point in the matrix
 for i , camera in enumerate(cameras):
     points=outlineView(room.visible_points_by_camera(camera))
