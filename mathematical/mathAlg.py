@@ -41,13 +41,30 @@ class Room:
                 visible_area += triangle_area
 
         return visible_area'''
+    def approximate_points(self, camera):
+        point_list = []
     
+    # Iterate over the range of sight
+        for i in range(-camera.range, camera.range + 1):
+            for j in range(-camera.range, camera.range + 1):
+            # Calculate the actual coordinates based on camera position
+                x = camera.x + i
+                y = camera.y + j
+            
+            # Check if the point is within the room's limits
+                if 0 <= x < self.length and 0 <= y < self.width:
+                    point_list.append((x, y))
+    
+        return point_list
+
+
     def visible_points_by_camera(self, camera):
         visible = []
-        for point in self.points:
+        for point in self.approximate_points(camera):
             if self.is_visible(camera, point):
                 visible.append(point)
         return visible
+
 
     def is_visible(self, camera, point):
         x, y = point
@@ -116,18 +133,20 @@ class Room:
 
     def point_matrix(self, cameras):
         matrix = {}
-        
-        for point in self.points:
-            matrix[point] = {
-                'camera_count': 0,
-                'cameras': []
-            }
-        
+    
         for camera in cameras:
-            for point in self.points:
-                if self.is_visible(camera, point):
-                    matrix[point]['camera_count'] += 1
-                    matrix[point]['cameras'].append(camera)
+        # Get visible points for the current camera once
+            visible_points = self.visible_points_by_camera(camera)
+        
+            for point in visible_points:
+                if point not in matrix:
+                    matrix[point] = {
+                        'camera_count': 0,
+                        'cameras': []
+                    }
+                matrix[point]['camera_count'] += 1
+                matrix[point]['cameras'].append(camera)
+    
         return matrix
     def compatibleCameraSet(self, cameras):
         test = True
