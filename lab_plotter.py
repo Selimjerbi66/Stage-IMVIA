@@ -1,27 +1,35 @@
 import matplotlib.pyplot as plt  # Importer la bibliothèque pyplot de matplotlib pour la visualisation
+import matplotlib.patches as patches
 import numpy as np  # Importer numpy pour la manipulation de tableaux numériques
 from lab_builder import *
 json_file_path = "labo.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 room = setUpLab(result)
-plt.figure(figsize=(room.length,room.width))
+fig, ax = plt.subplots(figsize=(room.length,room.width))  # Width: 10 inches, Height: 6 inches
 for i in range(len(room.walls)):
     print(room.walls[i])
-    if room.walls[i].thickness > 0 :
-        plt.plot([room.walls[i].x1,room.walls[i].x2],[room.walls[i].y1,room.walls[i].y2], linewidth = room.walls[i].thickness, label = room.walls[i].name)
-    else:
-        plt.plot([room.walls[i].x1,room.walls[i].x2],[room.walls[i].y1,room.walls[i].y2], label = room.walls[i].name)
+    # Create a rectangle patch
+    rectangle = patches.Rectangle(
+        (room.walls[i].xbl, room.walls[i].ybl),     # Bottom-left corner coordinates
+        room.walls[i].length,         # Length of the rectangle
+        room.walls[i].width,          # Width of the rectangle
+        linewidth=1,    # Thickness of the rectangle's edge
+        edgecolor='r',  # Color of the rectangle's edge (red)
+        facecolor='r'  # No fill color for the rectangle
+    )
+
+    # Add the rectangle patch to the axes
+    ax.add_patch(rectangle)
 
 
 # Set limits for the x-axis and y-axis
-plt.xlim(0, room.length)  # Set x-axis limit
-plt.ylim(0, room.width + 1)  # Set y-axis limit
+ax.set_xlim(-1, room.length + 1)  # X-axis limits
+ax.set_ylim(-1, room.width + 1)# Y-axis limits
 
 # Add labels and titles
-plt.title(room.name)
-plt.xlabel("X-axis")
-plt.ylabel("Y-axis")
-
+ax.set_xlabel('X-axis')  # X-axis label
+ax.set_ylabel('Y-axis')  # Y-axis label
+ax.set_title(room.name) # Title of the plot
 # Show grid
 #plt.grid()
 

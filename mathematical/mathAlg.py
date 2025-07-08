@@ -6,10 +6,10 @@ class Room:
         self.length = int(length)
         self.width = int(width)
         self.walls = [
-            Wall("side1", 0, 0, length, 0, 0),      # Bottom wall
-            Wall("side2",length, 0, length, width, 0),  # Right wall
-            Wall("side3",length, width, 0, width, 0),   # Top wall
-            Wall("side4",0, width, 0, 0, 0)           # Left wall
+            Wall("side1", 0, 0, length, 0, 1),      # Bottom wall
+            Wall("side2",length, 0, length, width, 1),  # Right wall
+            Wall("side3",length, width, 0, width, 1),   # Top wall
+            Wall("side4",0, width, 0, 0, 1)           # Left wall
         ]
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
@@ -164,7 +164,7 @@ class Wall:
         # Calculate corners of the rectangle
         if thickness !=0:
             
-            self.x3, self.y3, self.x4, self.y4, self.x5, self.y5, self.x6, self.y6 = calculate_corners(x1, y1, x2, y2, thickness)
+            self.length, self.width, self.xbl, self.ybl = calculate_corners(x1, y1, x2, y2, thickness)
 
     def point_on_segment(self, px, py):
         area = (self.y2 - self.y1) * (px - self.x1) - (self.x2 - self.x1) * (py - self.y1)
@@ -177,53 +177,43 @@ class Wall:
 
         return False
     def point_on_rectangle(self, px, py):
-    # Create a list of corners
-        corners = [
-        (self.x3, self.y3),  # Top-left
-        (self.x4, self.y4),  # Top-right
-        (self.x6, self.y6),  # Bottom-right
-        (self.x5, self.y5),  # Bottom-left
-        ]
+        # Extract the bottom-left corner and dimensions
+        xbl = self.xbl  # Bottom-left x-coordinate
+        ybl = self.ybl  # Bottom-left y-coordinate
+        length = self.length
+        width = self.width  # Width of the rectangle
 
-    # Use the ray-casting algorithm to check if the point is inside the polygon
-        inside = False
-        n = len(corners)
-    
-        for i in range(n):
-            x1, y1 = corners[i]
-            x2, y2 = corners[(i + 1) % n]
-        
-        # Check if the point is within the y-bounds of the edge
-            if ((y1 > py) != (y2 > py)) and (px < (x2 - x1) * (py - y1) / (y2 - y1) + x1):
-                inside = not inside
+        # Check if the point is within the rectangle's bounds
+        inside = (xbl <= px <= xbl + length) and (ybl <= py <= ybl + width)
 
         return inside
     def __str__(self):
-        return f"{self.name} from ({self.x1}, {self.y1}) to ({self.x2}, {self.y2})"
+        return (f"Length: {self.length}, Width: {self.width}, "
+                f"Bottom-left corner: ({self.xbl}, {self.ybl})")
 def calculate_corners(x1, y1, x2, y2, thickness):
-    # Calculate the angle of the wall
-        dx = x2 - x1
-        dy = y2 - y1
-        angle = math.atan2(dy, dx)
+    # Determine if the line is horizontal or vertical
+    if y1 == y2:  # Horizontal line
+        y_offset = thickness / 2
+        top_left = (min(x1, x2), y1 + y_offset)
+        top_right = (max(x1, x2), y1 + y_offset)
+        bottom_left = (min(x1, x2), y1 - y_offset)
+        bottom_right = (max(x1, x2), y1 - y_offset)
+    elif x1 == x2:  # Vertical line
+        x_offset = thickness / 2
+        top_left = (x1 - x_offset, max(y1, y2))
+        top_right = (x1 + x_offset, max(y1, y2))
+        bottom_left = (x1 - x_offset, min(y1, y2))
+        bottom_right = (x1 + x_offset, min(y1, y2))
+    else:
+        raise ValueError("The line must be either horizontal or vertical.")
 
-        # Calculate the half thickness offset
-        half_thickness = thickness / 2
+    # Calculate length and width from corners
+    length = abs(top_right[0] - top_left[0])  # Length follows the x-axis
+    width = abs(top_left[1] - bottom_left[1])  # Width follows the y-axis
 
-        # Calculate the offsets using the angle
-        offset_x = half_thickness * math.cos(angle + math.pi / 2)  # Perpendicular direction
-        offset_y = half_thickness * math.sin(angle + math.pi / 2)
+    bottom_left_corner = bottom_left  # Bottom-left corner is already defined
 
-        # Calculate the corners of the rectangle
-        x3 = x1 + offset_x
-        y3 = y1 + offset_y
-        x4 = x2 + offset_x
-        y4 = y2 + offset_y
-        x5 = x1 - offset_x
-        y5 = y1 - offset_y
-        x6 = x2 - offset_x
-        y6 = y2 - offset_y
-
-        return x3, y3, x4, y4, x5, y5, x6, y6
+    return length, width, bottom_left_corner[0], bottom_left_corner[1]
 
 class Camera:
     def __init__(self, name, x, y, orientation, angle_of_sight, range):
