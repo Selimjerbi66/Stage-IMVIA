@@ -45,8 +45,8 @@ class Room:
         point_list = []
     
     # Iterate over the range of sight
-        for i in range(-camera.range, camera.range + 1):
-            for j in range(-camera.range, camera.range + 1):
+        for i in range(- camera.range, camera.range + 1):
+            for j in range(- camera.range, camera.range + 1):
             # Calculate the actual coordinates based on camera position
                 x = camera.x + i
                 y = camera.y + j
@@ -96,19 +96,26 @@ class Room:
     def calculate_angle(self, camera, point):
         return math.degrees(math.atan2(point[1] - camera.y, point[0] - camera.x))
     def line_intersects_rectangle(self, xl1, yl1, xl2, yl2, wall):
-        # Define the rectangle sides using the wall's corners
+    # Calculate rectangle corners based on bottom-left corner, length, and width
+        xbl, ybl = wall.xbl, wall.ybl
+        xbr = xbl + wall.length  # Bottom-right corner
+        ybr = ybl                # Bottom-right corner y-coordinate
+        ytl = ybl + wall.width   # Top-left corner y-coordinate
+        ytr = ytl                # Top-right corner y-coordinate
+
+    # Define the rectangle sides using the calculated corners
         sides = [
-            (wall.x3, wall.y3, wall.x4, wall.y4),  # Top side
-            (wall.x4, wall.y4, wall.x6, wall.y6),  # Right side
-            (wall.x6, wall.y6, wall.x5, wall.y5),  # Bottom side
-            (wall.x5, wall.y5, wall.x3, wall.y3),  # Left side
-        ]
-        
-        # Check each side for intersection
+        (xbl, ytl, xbr, ytl),  # Top side
+        (xbr, ybl, xbr, ytl),  # Right side
+        (xbl, ybl, xbr, ybl),   # Bottom side
+        (xbl, ybl, xbl, ytl)    # Left side
+    ]
+    
+    # Check each side for intersection
         for (sx1, sy1, sx2, sy2) in sides:
             if self.line_intersects(xl1, yl1, xl2, yl2, sx1, sy1, sx2, sy2):
                 return True
-        
+    
         return False
     def line_intersects(self, x1, y1, x2, y2, x3, y3, x4, y4):
         denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
@@ -145,7 +152,7 @@ class Room:
                         'cameras': []
                     }
                 matrix[point]['camera_count'] += 1
-                matrix[point]['cameras'].append(camera)
+                matrix[point]['cameras'].append(camera.name)
     
         return matrix
     def compatibleCameraSet(self, cameras):

@@ -18,3 +18,11 @@ def setUpCameras(matrix):
         Cameras.append(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
         print(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
     return Cameras
+
+
+json_file_path = "labo.json"  # Replace with your JSON file path
+result = process_room_file(json_file_path)
+room = setUpLab(result)
+cameras = setUpCameras(process_cameras_file("cameraexp.json"))
+matrix = room.point_matrix(cameras)
+print(matrix)

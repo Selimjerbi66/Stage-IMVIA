@@ -9,14 +9,17 @@ def process_cameras_file(file_path):
 
     for camera in cameras:
         for camera_key, attributes in camera.items():
-            output.append([
-                camera_key,
-                attributes['x'],
-                attributes['y'],
-                attributes['orientation'],
-                attributes['angle'],
-                attributes['range']
-            ])
+            try:
+                output.append([
+                    camera_key,
+                    int(attributes['x']),
+                    int(attributes['y']),
+                    int(attributes['orientation']),  # Convert orientation to int
+                    int(attributes['angle']),
+                    int(attributes['range'])
+                ])
+            except (ValueError, KeyError) as e:
+                print(f"Error processing camera {camera_key}: {e}")
 
     return output
 '''
