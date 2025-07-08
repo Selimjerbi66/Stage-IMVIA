@@ -16,34 +16,10 @@ class Room:
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
     def area(self):
         return self.length * self.width
-    '''def area_of_field_of_vision(self, camera):
-        left_angle, right_angle = camera.get_field_of_view()
-        visible_area = 0
-        for wall in self.walls:
-            if self.line_intersects(camera.x, camera.y, 
-                                    camera.x + camera.range * math.cos(math.radians(left_angle)), 
-                                    camera.y + camera.range * math.sin(math.radians(left_angle)), 
-                                    wall.x1, wall.y1, wall.x2, wall.y2):
-                # Calculate intersection points and visible area
-                # This will require calculating the intersection points 
-                # and possibly creating a polygon of the visible area.
-                # For simplicity, assume we calculate the area directly.
-                # More complex logic could be added here to handle the polygon.
-                intersection_x1 = camera.x + camera.range * math.cos(math.radians(left_angle))
-                intersection_y1 = camera.y + camera.range * math.sin(math.radians(left_angle))
-                intersection_x2 = camera.x + camera.range * math.cos(math.radians(right_angle))
-                intersection_y2 = camera.y + camera.range * math.sin(math.radians(right_angle))
-                
-                # Calculate area of the triangle formed by the camera and intersection points
-                triangle_area = 0.5 * abs(camera.x * (intersection_y1 - intersection_y2) +
-                                           intersection_x1 * (intersection_y2 - camera.y) +
-                                           intersection_x2 * (camera.y - intersection_y1))
-                visible_area += triangle_area
 
-        return visible_area'''
     def approximate_points(self, camera):
         point_list = []
-    
+
     # Iterate over the range of sight
         for i in range(- camera.range, camera.range + 1):
             for j in range(- camera.range, camera.range + 1):
@@ -73,13 +49,8 @@ class Room:
             return False
 
         for wall in self.walls:
-            if wall.thickness == 0:
-
-                if self.line_intersects(camera.x, camera.y, x, y, wall.x1, wall.y1, wall.x2, wall.y2):
-                    return False
-            else:
-                if self.line_intersects_rectangle(camera.x, camera.y, x, y, wall):
-                    return False
+            if self.line_intersects_rectangle(camera.x, camera.y, x, y, wall):
+                return False
                 
         angle_to_point = self.calculate_angle(camera, point)
         left_angle, right_angle = camera.get_field_of_view()

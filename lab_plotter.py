@@ -47,7 +47,7 @@ for (x, y), data in matrix.items():
 
     # Plot the point with a small size
     ax.scatter(x, y, color=color, s=10)  # Set size to 10 for small points
-
+print(len(matrix))
 # Set limits for the x-axis and y-axis
 ax.set_xlim(-1, room.length + 1)  # X-axis limits
 ax.set_ylim(-1, room.width + 1)# Y-axis limits
