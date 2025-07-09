@@ -126,14 +126,17 @@ class Room:
         return matrix
     def compatibleCameraSet(self, cameras):
         test = True
+        print("teston")
         i=0
         while test and i<len(cameras):
             camera=cameras[i]
+            print(i)
             if not(0<=camera.x<=self.length and 0<=camera.y<=self.width):
                 test=False
+            i+=1
         for camera in cameras:
             for wall in self.walls:
-                if wall.point_on_rectangle(self, camera.x, camera.y)==True:
+                if wall.point_on_rectangle(camera.x, camera.y)==True:
                     return False
 
         return test
@@ -194,7 +197,6 @@ def calculate_corners(x1, y1, x2, y2, thickness):
         top_left = (x1 - x_offset, max(y1, y2))
         top_right = (x1 + x_offset, max(y1, y2))
         bottom_left = (x1 - x_offset, min(y1, y2))
-        bottom_right = (x1 + x_offset, min(y1, y2))
     else:
         raise ValueError("The line must be either horizontal or vertical.")
 
