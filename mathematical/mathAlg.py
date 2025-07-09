@@ -84,19 +84,25 @@ class Room:
         for (sx1, sy1, sx2, sy2) in sides:
             if self.line_intersects(xl1, yl1, xl2, yl2, sx1, sy1, sx2, sy2):
                 return True
-    
+
         return False
     def line_intersects(self, x1, y1, x2, y2, x3, y3, x4, y4):
+    # Calculate the denominator
         denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
 
+    # Check if lines are parallel
         if denominator == 0:
-            if self.on_segment(x1, y1, x2, y2, x3, y3) or self.on_segment(x1, y1, x2, y2, x4, y4) or self.on_segment(x3, y3, x4, y4, x1, y1) or self.on_segment(x3, y3, x4, y4, x2, y2):
-                return True
-            return False
+        # Check if any endpoint is on the other segment
+            return (self.on_segment(x1, y1, x2, y2, x3, y3) or
+                    self.on_segment(x1, y1, x2, y2, x4, y4) or
+                    self.on_segment(x3, y3, x4, y4, x1, y1) or
+                    self.on_segment(x3, y3, x4, y4, x2, y2))
 
+    # Calculate t and u
         t = ((x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1)) / denominator
         u = -((x4 - x3) * (y3 - y1) - (y4 - y3) * (x3 - x1)) / denominator
 
+    # Check if the intersection point lies within both segments
         if 0 <= t <= 1 and 0 <= u <= 1:
             intersection_x = x1 + t * (x2 - x1)
             intersection_y = y1 + t * (y2 - y1)
@@ -105,7 +111,32 @@ class Room:
         return False
 
     def on_segment(self, px, py, qx, qy, rx, ry):
+    # Check if point (rx, ry) is on the segment (px, py) to (qx, qy)
         return min(px, qx) <= rx <= max(px, qx) and min(py, qy) <= ry <= max(py, qy)
+
+    def check_alignments(self, list_of_points, extra_point):
+        to_remove = []  # List to keep track of points to remove
+        num_points = len(list_of_points)
+
+        i = 0
+        while i < num_points:
+            p = list_of_points[i]
+            j = 0
+            while j < num_points:
+                if j != i:  # Avoid checking the same point
+                    pos = list_of_points[j]
+                    if self.on_segment(extra_point[0], extra_point[1], p[0], p[1], pos[0], pos[1]):
+                        if pos not in to_remove:
+                            to_remove.append(pos)
+                j += 1
+            i += 1
+
+        # Remove points that were found to be collinear with the extra point
+        for point in to_remove:
+            if point in list_of_points:
+                list_of_points.remove(point)
+
+        return list_of_points
 
     def point_matrix(self, cameras):
         matrix = {}
@@ -126,7 +157,6 @@ class Room:
         return matrix
     def compatibleCameraSet(self, cameras):
         test = True
-        print("teston")
         i=0
         while test and i<len(cameras):
             camera=cameras[i]
