@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt  # Importer la bibliothèque pyplot de matplotli
 import matplotlib.patches as patches
 import numpy as np  # Importer numpy pour la manipulation de tableaux numériques
 from lab_builder import *
-from mathematical.camfield import *
+
 hex_codes = [
     '#000000',  # Black (lowest intensity)
     '#0000FF',  # Blue
@@ -37,17 +37,23 @@ for i in range(len(room.walls)):
     ax.add_patch(rectangle)
 cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
 # Loop through each point in the matrix
-for i , camera in enumerate(cameras):
-    points=outlineView(room.visible_points_by_camera(camera))
-    print(i)
-    print(points)
-    if points:
-    # Create a polygon from the points
-        polygon = patches.Polygon(points, closed=True, facecolor=hex_codes[2], edgecolor=hex_codes[3], linewidth=1)
-    
-    # Add the polygon to your plot (assuming you have an `ax` defined)
-        ax.add_patch(polygon)
+camView = room.check_alignments(cameras)
+print(camView)
+print(len(camView))
+for camera_name, points in camView:
+        # Find the camera's coordinates
+        camera = next((cam for cam in cameras if cam.name == camera_name), None)
+        if camera is None:
+            continue
+        
+        # Draw lines from camera to each point
+        for point in points:
+            ax.plot([camera.x, point[0]], [camera.y, point[1]], 'b-')  # Draw line
+            ax.plot(camera.x, camera.y, 'ro')  # Draw camera position
+            ax.text(camera.x, camera.y, camera.name, fontsize=9, ha='right')  # Label camera
 
+            # Draw the point
+            ax.plot(point[0], point[1], 'go')  # Draw point
 # Set limits for the x-axis and y-axis
 ax.set_xlim(-1, room.length + 1)  # X-axis limits
 ax.set_ylim(-1, room.width + 1)# Y-axis limits

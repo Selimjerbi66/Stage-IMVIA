@@ -1,0 +1,49 @@
+{
+    "cameras": [
+        {
+            "camera1": {
+                "x": "50",
+                "y": "100",
+                "orientation": "0",
+                "angle": "90",
+                "range": "100"
+            }
+        },
+        {
+            "camera2": {
+                "x": "150",
+                "y": "200",
+                "orientation": "90",
+                "angle": "80",
+                "range": "100"
+            }
+        },
+        {
+            "camera3": {
+                "x": "300",
+                "y": "150",
+                "orientation": "180",
+                "angle": "70",
+                "range": "100"
+            }
+        },
+        {
+            "camera4": {
+                "x": "400",
+                "y": "200",
+                "orientation": "270",
+                "angle": "90",
+                "range": "100"
+            }
+        },
+        {
+            "camera5": {
+                "x": "600",
+                "y": "100",
+                "orientation": "315",
+                "angle": "45",
+                "range": "100"
+            }
+        }
+    ]
+}

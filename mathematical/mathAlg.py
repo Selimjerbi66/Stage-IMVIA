@@ -1,5 +1,5 @@
 import math
-
+from mathematical.camfield import *
 class Room:
     def __init__(self, name, length, width, walls=None):
         self.name = name
@@ -38,6 +38,7 @@ class Room:
         visible = []
         for point in self.approximate_points(camera):
             if self.is_visible(camera, point):
+                print (point)
                 visible.append(point)
         return visible
 
@@ -114,29 +115,26 @@ class Room:
     # Check if point (rx, ry) is on the segment (px, py) to (qx, qy)
         return min(px, qx) <= rx <= max(px, qx) and min(py, qy) <= ry <= max(py, qy)
 
-    def check_alignments(self, list_of_points, extra_point):
-        to_remove = []  # List to keep track of points to remove
-        num_points = len(list_of_points)
+    def check_alignments(self, cameras):
+        camView=camViewer(self, cameras)
+        for camera_name, points in camView:
+            camera = next((cam for cam in cameras if cam.name == camera_name), None)
+            if camera is None:
+                continue
+            
+            # Convert points to a set for efficient removal
+            to_remove = set()
 
-        i = 0
-        while i < num_points:
-            p = list_of_points[i]
-            j = 0
-            while j < num_points:
-                if j != i:  # Avoid checking the same point
-                    pos = list_of_points[j]
-                    if self.on_segment(extra_point[0], extra_point[1], p[0], p[1], pos[0], pos[1]):
-                        if pos not in to_remove:
-                            to_remove.append(pos)
-                j += 1
-            i += 1
+            for p1 in points:
+                for p2 in points:
+                    if p1 != p2:  # Avoid checking the same point
+                        if self.on_segment(camera.x, camera.y, p1[0], p1[1], p2[0], p2[1]):
+                            to_remove.add(p2)  # Add intermediary point to remove set
 
-        # Remove points that were found to be collinear with the extra point
-        for point in to_remove:
-            if point in list_of_points:
-                list_of_points.remove(point)
+            # Remove intermediary points from the list of points
+            points[:] = [point for point in points if point not in to_remove]
 
-        return list_of_points
+        return camView
 
     def point_matrix(self, cameras):
         matrix = {}
@@ -243,6 +241,7 @@ class Camera:
         self.name = name
         self.x = x
         self.y = y
+        self.pos = (x,y)
         self.orientation = orientation
         self.angle_of_sight = angle_of_sight
         self.range = range

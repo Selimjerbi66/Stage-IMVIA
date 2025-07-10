@@ -18,15 +18,19 @@ def setUpCameras(matrix, Room):
     for i in matrix:
         Cameras.append(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
         print(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
-    if Room.compatibleCameraSet(Cameras)==False:
-        print('cameras uncompatible')
-        return []
+    
     return Cameras
 
-
+'''
 json_file_path = "labo.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 room = setUpLab(result)
 cameras = setUpCameras(process_cameras_file("cameraexp.json"),room)
+s=[]
 for i in cameras:
     print(i)
+    to_view = room.visible_points_by_camera(i)
+    s.append((i.name,to_view))
+    print(to_view)
+print(s)
+'''
