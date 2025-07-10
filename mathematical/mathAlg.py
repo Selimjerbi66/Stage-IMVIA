@@ -67,53 +67,54 @@ class Room:
 
     def calculate_angle(self, camera, point):
         return math.degrees(math.atan2(point[1] - camera.y, point[0] - camera.x))
+
+    def orientation(self, p, q, r):
+        """ Determine the orientation of the triplet (p, q, r).
+            0 -> p, q and r are collinear
+            1 -> Clockwise
+            2 -> Counterclockwise
+        """
+        val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+        if val == 0:
+            return 0
+        return 1 if val > 0 else 2
+
+    def on_segment(self, p, q, r):
+        """ Check if point q lies on segment pr """
+        return (min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and
+                min(p[1], r[1]) <= q[1] <= max(p[1], r[1]))
+
+    def do_lines_intersect(self, p1, p2, p3, p4):
+        """ Check if line segments p1p2 and p3p4 intersect. """
+        o1 = self.orientation(p1, p2, p3)
+        o2 = self.orientation(p1, p2, p4)
+        o3 = self.orientation(p3, p4, p1)
+        o4 = self.orientation(p3, p4, p2)
+
+        # General case
+        if o1 != o2 and o3 != o4:
+            return True
+
+        # Special cases for collinear points
+        if o1 == 0 and self.on_segment(p1, p3, p2): return True
+        if o2 == 0 and self.on_segment(p1, p4, p2): return True
+        if o3 == 0 and self.on_segment(p3, p1, p4): return True
+        if o4 == 0 and self.on_segment(p4, p2, p3): return True
+
+        return False
+
     def line_intersects_rectangle(self, xl1, yl1, xl2, yl2, wall):
-    # Calculate rectangle corners based on bottom-left corner, length, and width
-        xbl, ybl = wall.xbl, wall.ybl
-        xbr = xbl + wall.length  # Bottom-right corner
-        ytl = ybl + wall.width   # Top-left corner y-coordinate
+        """ Check if the line segment intersects with the rectangle. """
 
-    # Define the rectangle sides using the calculated corners
-        sides = [
-        (xbl, ytl, xbr, ytl),  # Top side
-        (xbr, ybl, xbr, ytl),  # Right side
-        (xbl, ybl, xbr, ybl),   # Bottom side
-        (xbl, ybl, xbl, ytl)    # Left side
-    ]
-    
-    # Check each side for intersection
-        for (sx1, sy1, sx2, sy2) in sides:
-            if self.line_intersects(xl1, yl1, xl2, yl2, sx1, sy1, sx2, sy2):
-                return True
+        p1, p2, p3, p4 = corners_coordinates(wall.length, wall.width, wall.xbl, wall.ybl)
+        seg_start = (xl1, yl1)
+        seg_end = (xl2, yl2)
 
-        return False
-    def line_intersects(self, x1, y1, x2, y2, x3, y3, x4, y4):
-    # Calculate the denominator
-        denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
-
-    # Check if lines are parallel
-        if denominator == 0:
-        # Check if any endpoint is on the other segment
-            return (self.on_segment(x1, y1, x2, y2, x3, y3) or
-                    self.on_segment(x1, y1, x2, y2, x4, y4) or
-                    self.on_segment(x3, y3, x4, y4, x1, y1) or
-                    self.on_segment(x3, y3, x4, y4, x2, y2))
-
-    # Calculate t and u
-        t = ((x3 - x1) * (y2 - y1) - (y3 - y1) * (x2 - x1)) / denominator
-        u = -((x4 - x3) * (y3 - y1) - (y4 - y3) * (x3 - x1)) / denominator
-
-    # Check if the intersection point lies within both segments
-        if 0 <= t <= 1 and 0 <= u <= 1:
-            intersection_x = x1 + t * (x2 - x1)
-            intersection_y = y1 + t * (y2 - y1)
-            return self.on_segment(x1, y1, x2, y2, intersection_x, intersection_y) and self.on_segment(x3, y3, x4, y4, intersection_x, intersection_y)
-
-        return False
-
-    def on_segment(self, px, py, qx, qy, rx, ry):
-    # Check if point (rx, ry) is on the segment (px, py) to (qx, qy)
-        return min(px, qx) <= rx <= max(px, qx) and min(py, qy) <= ry <= max(py, qy)
+        # Check intersection with each edge of the rectangle
+        return (self.do_lines_intersect(p1, p2, seg_start, seg_end) or
+                self.do_lines_intersect(p2, p3, seg_start, seg_end) or
+                self.do_lines_intersect(p3, p4, seg_start, seg_end) or
+                self.do_lines_intersect(p4, p1, seg_start, seg_end))
 
     def check_alignments(self, cameras):
         camView=camViewer(self, cameras)
@@ -128,7 +129,10 @@ class Room:
             for p1 in points:
                 for p2 in points:
                     if p1 != p2:  # Avoid checking the same point
-                        if self.on_segment(camera.x, camera.y, p1[0], p1[1], p2[0], p2[1]):
+                        p = (camera.x, camera.y)
+                        q=(p2[0], p2[1])
+                        r=(p1[0], p1[1])
+                        if self.on_segment(p,q,r):
                             to_remove.add(p2)  # Add intermediary point to remove set
 
             # Remove intermediary points from the list of points
@@ -241,7 +245,25 @@ def calculate_corners(x1, y1, x2, y2, thickness):
     bottom_left_corner = bottom_left  # Bottom-left corner is already defined
 
     return length, width, bottom_left_corner[0], bottom_left_corner[1]
+def corners_coordinates(length, width, bottom_left_x, bottom_left_y):
+    """ Calculate the coordinates of the rectangle corners.
 
+    Args:
+        length (float): The length of the rectangle.
+        width (float): The width of the rectangle.
+        bottom_left_x (float): The x-coordinate of the bottom-left corner.
+        bottom_left_y (float): The y-coordinate of the bottom-left corner.
+
+    Returns:
+        list: A list of tuples representing the corners in the order: 
+              (bottom-left, bottom-right, upper-right, upper-left).
+    """
+    bl = (bottom_left_x, bottom_left_y)
+    br = (bottom_left_x + length, bottom_left_y)
+    ur = (bottom_left_x + length, bottom_left_y + width)
+    ul = (bottom_left_x, bottom_left_y + width)
+    
+    return [bl, br, ur, ul]
 class Camera:
     def __init__(self, name, x, y, orientation, angle_of_sight, range):
         self.name = name
