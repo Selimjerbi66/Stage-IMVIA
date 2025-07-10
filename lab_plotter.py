@@ -45,7 +45,7 @@ for camera_name, points in camView:
         camera = next((cam for cam in cameras if cam.name == camera_name), None)
         if camera is None:
             continue
-        
+        print(len(points))
         # Draw lines from camera to each point
         for point in points:
             ax.plot([camera.x, point[0]], [camera.y, point[1]], 'b-')  # Draw line
@@ -53,7 +53,9 @@ for camera_name, points in camView:
             ax.text(camera.x, camera.y, camera.name, fontsize=9, ha='right')  # Label camera
 
             # Draw the point
-            ax.plot(point[0], point[1], 'go')  # Draw point
+            ax.plot(point[0], point[1])  # Draw point
+            print(point, "done")
+
 # Set limits for the x-axis and y-axis
 ax.set_xlim(-1, room.length + 1)  # X-axis limits
 ax.set_ylim(-1, room.width + 1)# Y-axis limits
