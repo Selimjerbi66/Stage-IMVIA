@@ -38,6 +38,13 @@ for i in range(len(room.walls)):
 cameras = setUpCameras(process_cameras_file("surveillance.json"), room)
 # Loop through each point in the matrix
 camView = room.check_alignments(cameras)
+'''
+for i in cameras:
+    to_view = room.visible_points_by_camera(i)
+    for p in to_view:
+        print(p)
+        ax.scatter(p[0], p[1], color='#FFD700')
+'''
 print(camView)
 print(len(camView))
 for camera_name, points in camView:
