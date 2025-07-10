@@ -153,22 +153,28 @@ class Room:
                 matrix[point]['cameras'].append(camera.name)
     
         return matrix
+    def compatibleCamera(self, camera, reject_list):
+    # Check if the camera is within the room dimensions
+        if not (0 <= camera.x <= self.length and 0 <= camera.y <= self.width):
+            reject_list.append(camera)
+            return False, reject_list
+    
+    # Check if the camera is on any wall
+        for wall in self.walls:
+            if wall.point_on_rectangle(camera.x, camera.y):
+                reject_list.append(camera)
+                return False, reject_list
+
+        return True, reject_list
     def compatibleCameraSet(self, cameras):
-        test = True
-        i=0
-        while test and i<len(cameras):
-            camera=cameras[i]
-            print(i)
-            if not(0<=camera.x<=self.length and 0<=camera.y<=self.width):
-                test=False
-            i+=1
+        reject_list = []  # Initialize the reject list
+
         for camera in cameras:
-            for wall in self.walls:
-                if wall.point_on_rectangle(camera.x, camera.y)==True:
-                    return False
+            is_compatible, reject_list = self.compatibleCamera(camera, reject_list)
+            if not is_compatible:
+                return False  # Return False immediately if any camera is incompatible
 
-        return test
-
+        return True  # All cameras are compatible
 
     def __str__(self):
         return (f"Room(length={self.length}, width={self.width}, "

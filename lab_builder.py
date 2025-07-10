@@ -14,9 +14,12 @@ def setUpLab(matrix):
     return Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls)
 def setUpCameras(matrix, Room):
     Cameras=[]
-    
+    test = True
+    rejected_list = []
     for i in matrix:
-        Cameras.append(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
+        test, rejected_list =Room.compatibleCamera(Camera(i[0],i[1],i[2],i[3],i[4],i[5]), rejected_list)
+        if test:
+            Cameras.append(Camera(i[0], i[1], i[2], i[3], i[4], i[5]))
         print(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))
     
     return Cameras
