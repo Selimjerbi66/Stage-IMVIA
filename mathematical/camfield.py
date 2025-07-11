@@ -9,5 +9,5 @@ def camViewer(room, cameras):
     for i in cameras:
         to_view = room.visible_points_by_camera(i)
         s.append((i.name,to_view))
-        print(s)
+        '''print(s)'''
     return (s)

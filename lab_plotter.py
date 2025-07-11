@@ -35,24 +35,22 @@ for i in range(len(room.walls)):
 
     # Add the rectangle patch to the axes
     ax.add_patch(rectangle)
-cameras = setUpCameras(process_cameras_file("surveillance.json"), room)
+cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
 # Loop through each point in the matrix
 camView = room.check_alignments(cameras)
 '''
 for i in cameras:
     to_view = room.visible_points_by_camera(i)
     for p in to_view:
-        print(p)
         ax.scatter(p[0], p[1], color='#FFD700')
 '''
 print(camView)
-print(len(camView))
 for camera_name, points in camView:
         # Find the camera's coordinates
         camera = next((cam for cam in cameras if cam.name == camera_name), None)
         if camera is None:
             continue
-        print(len(points))
+        print('longeur',len(points))
         # Draw lines from camera to each point
         for point in points:
             ax.plot([camera.x, point[0]], [camera.y, point[1]], 'b-')  # Draw line

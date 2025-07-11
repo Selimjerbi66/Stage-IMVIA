@@ -38,7 +38,7 @@ class Room:
         visible = []
         for point in self.approximate_points(camera):
             if self.is_visible(camera, point):
-                print (point)
+                '''print (point)'''
                 visible.append(point)
         return visible
 
@@ -80,9 +80,21 @@ class Room:
         return 1 if val > 0 else 2
 
     def on_segment(self, p, q, r):
-        """ Check if point q lies on segment pr """
-        return (min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and
-                min(p[1], r[1]) <= q[1] <= max(p[1], r[1]))
+        """ Check if point q lies on the line segment 'pr' """
+    # Check for collinearity using the area method
+        area = (p[0] * (r[1] - q[1]) +
+                r[0] * (q[1] - p[1]) +
+                q[0] * (p[1] - r[1]))
+    
+        if area != 0:  # Points are not collinear
+            return False
+
+    # Check if q is within the bounding box defined by p and r
+        if (min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and
+            min(p[1], r[1]) <= q[1] <= max(p[1], r[1])):
+            return True
+    
+        return False
 
     def do_lines_intersect(self, p1, p2, p3, p4):
         """ Check if line segments p1p2 and p3p4 intersect. """
@@ -117,25 +129,44 @@ class Room:
                 self.do_lines_intersect(p4, p1, seg_start, seg_end))
 
     def check_alignments(self, cameras):
-        camView=camViewer(self, cameras)
+        camView = camViewer(self, cameras)
+        file = open('undesired.txt', 'w')  # Open file for writing
         for camera_name, points in camView:
             camera = next((cam for cam in cameras if cam.name == camera_name), None)
             if camera is None:
                 continue
-            
-            # Convert points to a set for efficient removal
+        
+        # Convert points to a set for efficient removal
             to_remove = set()
 
+        # Iterate over pairs of points
             for p1 in points:
                 for p2 in points:
                     if p1 != p2:  # Avoid checking the same point
                         p = (camera.x, camera.y)
-                        q=(p2[0], p2[1])
-                        r=(p1[0], p1[1])
-                        if self.on_segment(p,q,r):
-                            to_remove.add(p2)  # Add intermediary point to remove set
+                        q = (p2[0], p2[1])
+                        r = (p1[0], p1[1])
+                        if self.on_segment(p, q, r):
+                        # Determine which point to remove: the closer one
+                            dist_p1 = (p1[0] - camera.x) ** 2 + (p1[1] - camera.y) ** 2
+                            dist_p2 = (p2[0] - camera.x) ** 2 + (p2[1] - camera.y) ** 2
 
-            # Remove intermediary points from the list of points
+                            # Print the equation of the line
+                            print(f"Camera at {p}, Point1 at {r}, Point2 at {q}")
+                            print(f"Equation: Line through {p} and {q}")
+                            # Save messages to the file
+                            file.write(f"Camera at {p}, Point1 at {r}, Point2 at {q}\n")
+                            file.write(f"Equation: Line through {p} and {q}\n")
+                            if dist_p1 < dist_p2:
+                                print(f"Removing Point1 {p1} (closer to camera). Aligned with Point2 {p2}.")
+                                file.write(f"Removing Point1 {p1} (closer to camera). Aligned with Point2 {p2}.\n")
+                                to_remove.add(p1)  # Remove the closer point
+                            else:
+                                print(f"Removing Point2 {p2} (closer to camera). Aligned with Point1 {p1}.")
+                                file.write(f"Removing Point2 {p2} (closer to camera). Aligned with Point1 {p1}.\n")
+                                to_remove.add(p2)  # Remove the closer point
+
+        # Remove intermediary points from the list of points
             points[:] = [point for point in points if point not in to_remove]
 
         return camView
