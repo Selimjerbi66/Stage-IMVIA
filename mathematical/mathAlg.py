@@ -184,10 +184,8 @@ class Room:
             for point in visible_points:
                 if point not in matrix:
                     matrix[point] = {
-                        'camera_count': 0,
                         'cameras': []
                     }
-                matrix[point]['camera_count'] += 1
                 matrix[point]['cameras'].append(camera.name)
     
         return matrix
@@ -321,77 +319,6 @@ class Camera:
                 f"range={self.range})")
 
 
-class ViewField:
-    def __init__(self, camera, field):
-        # Extract camera parameters
-        self.camera_name = camera.name
-        self.camera_position = (camera.x, camera.y)
-
-        # Extract the points to view
-        self.viewsite = field
-
-        # Rearrange points in clockwise order
-        self.clockwise_points = self.rearrange_clockwise(camera)
-
-    def normalize_angle(self, angle):
-        """ Normalize angle to be within [0, 360) degrees. """
-        return angle % 360
-
-    def rearrange_clockwise(self, camera):
-        """ Rearrange the points in clockwise order around the camera position using bubble sort. """
-        cx, cy = self.camera_position
-
-        # Get the field of view angles
-        left_angle, right_angle = camera.get_field_of_view()
-        
-        # Log to file
-        with open('rearranging.txt', 'w') as log_file:
-            log_file.write(f"Camera Position: {self.camera_position}\n")
-            log_file.write(f"Field of View Angles: Left = {left_angle}, Right = {right_angle}\n")
-
-            # Calculate angles for each point
-            angle_points = []
-            for point in self.viewsite:
-                angle = math.degrees(math.atan2(point[1] - cy, point[0] - cx))
-                normalized_angle = self.normalize_angle(angle)
-                angle_points.append((normalized_angle, point))
-                log_file.write(f"Point: {point}, Angle: {normalized_angle}\n")
-
-            # Bubble sort based on angles, comparing to the right angle
-            n = len(angle_points)
-            for i in range(n):
-                for j in range(0, n - i - 1):
-                    log_file.write(f"Comparing: {angle_points[j]} and {angle_points[j + 1]}\n")
-                    if abs(angle_points[j][0] - right_angle) > abs(angle_points[j + 1][0] - right_angle):
-                        angle_points[j], angle_points[j + 1] = angle_points[j + 1], angle_points[j]
-                        log_file.write(f"Swapped: {angle_points[j]} and {angle_points[j + 1]}\n")
-
-            # Extract sorted points
-            sorted_points = [point for _, point in angle_points]
-
-            # Add the camera position at the beginning and end to close the polygon
-            sorted_points.insert(0, self.camera_position)
-            sorted_points.append(self.camera_position)
-
-            log_file.write(f"Sorted Points: {sorted_points}\n")
-
-        return sorted_points
-
-    def cam(self):
-        """ Return the camera position. """
-        return self.camera_position
-
-    def drawx(self):
-        """ Return x coordinates of the polygon points. """
-        polygon_points = [self.camera_position] + self.clockwise_points + [self.camera_position]
-        x, _ = zip(*polygon_points)
-        return x
-
-    def drawy(self):
-        """ Return y coordinates of the polygon points. """
-        polygon_points = [self.camera_position] + self.clockwise_points + [self.camera_position]
-        _, y = zip(*polygon_points)
-        return y
 
 
 hex_codes = [

@@ -19,31 +19,33 @@ for i in range(len(room.walls)):
 
     # Add the rectangle patch to the axes
     ax.add_patch(rectangle)
-cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
+cameras = setUpCameras(process_cameras_file("surveillance.json"), room)
 # Loop through each point in the matrix
-camView = room.check_alignments(cameras)
+
+viewable=room.point_matrix(cameras)
+for point, data in viewable.items():
+    x, y = point  # Unpack the tuple (x, y)
+    n = len(data['cameras'])  # Number of cameras linked to the point
+        
+        # Use modulo to cycle through hex_codes if there are more cameras than colors
+    color = hex_codes[n % len(hex_codes)]  
+        
+        # Scatter the point with its respective color
+    ax.scatter(x, y, color=color, s=1)
+
+
+for camera in cameras:
+    ax.scatter(camera.x, camera.y, color='red', s=10) # Smallest marker size
+    ax.text(camera.x, camera.y, camera.name, fontsize=10)
+
 '''
 for i in cameras:
     to_view = room.visible_points_by_camera(i)
     for p in to_view:
+        print(p)
         ax.scatter(p[0], p[1], color='#FFD700')
 '''
-print(camView)
 
-for camera_name, points in camView:
-    # Find the camera's coordinates
-    camera = next((cam for cam in cameras if cam.name == camera_name), None)
-    if camera is None or not points:  # Check for None or empty points
-        continue
-    
-    print('length', len(points))
-    
-    vision = ViewField(camera, points)
-    
-    # Draw lines from camera to each point
-    ax.fill(vision.drawx(), vision.drawy(),color=hex_codes[4], edgecolor=hex_codes[4])  # Call drawy() correctly
-    ax.scatter(*vision.cam(), color='red', label=vision.camera_name)  # Mark the camera position
-    ax.text(camera.x, camera.y, camera.name, fontsize=9, ha='right')
 
 # Set limits for the x-axis and y-axis
 ax.set_xlim(-1, room.length + 1)  # X-axis limits
