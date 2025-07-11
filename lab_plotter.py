@@ -1,6 +1,5 @@
 from lab_builder import *
 
-
 json_file_path = "labo.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 room = setUpLab(result)
@@ -19,7 +18,7 @@ for i in range(len(room.walls)):
 
     # Add the rectangle patch to the axes
     ax.add_patch(rectangle)
-cameras = setUpCameras(process_cameras_file("surveillance.json"), room)
+cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
 # Loop through each point in the matrix
 
 viewable=room.point_matrix(cameras)
@@ -58,6 +57,5 @@ ax.set_title(room.name)   # Title of the plot
 
 # Show grid if needed
 # plt.grid()
-
 # Display the plot
 plt.show()
