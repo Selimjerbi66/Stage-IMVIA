@@ -22,16 +22,26 @@ cameras = setUpCameras(process_cameras_file("cameraexp.json"), room)
 # Loop through each point in the matrix
 
 viewable=room.point_matrix(cameras)
-for point, data in viewable.items():
-    x, y = point  # Unpack the tuple (x, y)
-    n = len(data['cameras'])  # Number of cameras linked to the point
-        
-        # Use modulo to cycle through hex_codes if there are more cameras than colors
-    color = hex_codes[n % len(hex_codes)]  
-        
-        # Scatter the point with its respective color
-    ax.scatter(x, y, color=color, s=1)
 
+    # Prepare to plot viewable points
+points = []
+colors = []
+sizes = []
+    
+for point, data in viewable.items():
+    x, y = point
+    n = len(data['cameras'])
+    color = hex_codes[n % len(hex_codes)]
+        
+    points.append((x, y))
+    colors.append(color)
+    sizes.append(1)  # Size for scatter plot
+
+    # Convert to numpy arrays for more efficient plotting
+points = np.array(points)
+    
+    # Scatter all points in one go
+ax.scatter(points[:, 0], points[:, 1], color=colors, s=sizes)
 
 for camera in cameras:
     ax.scatter(camera.x, camera.y, color='red', s=10) # Smallest marker size
