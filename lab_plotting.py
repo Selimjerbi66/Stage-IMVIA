@@ -5,9 +5,7 @@ def plotLab(room, cameras, viewable):
     fig, ax = plt.subplots(figsize=(room.length, room.width))
 
     # Draw the walls of the room using a collection
-    wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width,
-                                          linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0])
-                       for wall in room.walls]
+    wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0]) for wall in room.walls]
     for rectangle in wall_rectangles:
         ax.add_patch(rectangle)
 
@@ -33,7 +31,11 @@ def plotLab(room, cameras, viewable):
 
     # Plot cameras
     camera_positions = [(camera.x, camera.y) for camera in cameras]
+    camera_names=[camera.name for camera in cameras]
     ax.scatter(*zip(*camera_positions), color='red', s=10)
+    # Add camera names
+    for (x, y), name in zip(camera_positions, camera_names):
+        ax.text(x, y, name, fontsize=10, ha='center', va='bottom',)
 
     # Set limits, labels, and title
     ax.set_xlim(-1, room.length + 1)

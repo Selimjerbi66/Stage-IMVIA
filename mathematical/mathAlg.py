@@ -38,12 +38,8 @@ class Room:
 
 
     def visible_points_by_camera(self, camera):
-        visible = []
-        for point in self.approximate_points(camera):
-            if self.is_visible(camera, point):
-                '''print (point)'''
-                visible.append(point)
-        return visible
+    # Use a list comprehension for better performance and readability
+        return [point for point in self.approximate_points(camera) if self.is_visible(camera, point)]
 
 
     def is_visible(self, camera, point):
@@ -176,18 +172,19 @@ class Room:
 
     def point_matrix(self, cameras):
         matrix = {}
-    
+
         for camera in cameras:
         # Get visible points for the current camera once
             visible_points = self.visible_points_by_camera(camera)
-        
+
+        # Use a set to avoid redundant entries
+            camera_name = camera.name
             for point in visible_points:
-                if point not in matrix:
-                    matrix[point] = {
-                        'cameras': []
-                    }
-                matrix[point]['cameras'].append(camera.name)
-    
+                if point in matrix:
+                    matrix[point]['cameras'].append(camera_name)
+                else:
+                    matrix[point] = {'cameras': [camera_name]}  # Initialize with the camera name
+
         return matrix
     def compatibleCamera(self, camera, reject_list):
     # Check if the camera is within the room dimensions
