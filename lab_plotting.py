@@ -9,6 +9,20 @@ def plotLab(room, cameras, viewable):
     for rectangle in wall_rectangles:
         ax.add_patch(rectangle)
 
+
+# Draw zones
+    for zone in room.zones:
+    # Create a rectangle patch for each zone
+        zone_rectangle = patches.Rectangle(
+        (zone.blc[0], zone.blc[1]),  # Bottom-left corner coordinates
+        zone.length,                 # Length of the rectangle
+        zone.width,                  # Width of the rectangle
+        linewidth=1,                 # Thickness of the rectangle's edge
+        edgecolor=hex_codes[5],      # Edge color for zones
+        facecolor=hex_codes[5]       # Fill color for zones
+        )
+        ax.add_patch(zone_rectangle)
+
     # Prepare to plot viewable points
     points = []
     colors = []
