@@ -23,17 +23,22 @@ class Room:
     def approximate_points(self, camera):
         point_list = []
 
-    # Iterate over the range of sight
-        for i in range(- camera.range, camera.range + 1):
-            for j in range(- camera.range, camera.range + 1):
-            # Calculate the actual coordinates based on camera position
-                x = camera.x + i
-                y = camera.y + j
-            
-            # Check if the point is within the room's limits
-                if 0 <= x < self.length and 0 <= y < self.width:
-                    point_list.append((x, y))
-    
+    # Extract camera attributes for better readability
+        camera_x = camera.x
+        camera_y = camera.y
+        camera_range = camera.range
+
+    # Calculate bounds based on camera position and range
+        min_x = max(0, camera_x - camera_range)
+        max_x = min(self.length, camera_x + camera_range)
+        min_y = max(0, camera_y - camera_range)
+        max_y = min(self.width, camera_y + camera_range)
+
+    # Iterate over the range of sight within the calculated bounds
+        for x in range(min_x, max_x + 1):
+            for y in range(min_y, max_y + 1):
+                point_list.append((x, y))
+
         return point_list
 
 
@@ -44,24 +49,28 @@ class Room:
 
     def is_visible(self, camera, point):
         x, y = point
-        distance = math.hypot(x - camera.x, y - camera.y)
-        if distance > camera.range:
+        distance_squared = (x - camera.x) ** 2 + (y - camera.y) ** 2
+
+    # Early exit if the point is out of the camera's range (using squared distance)
+        if distance_squared > camera.range ** 2:
             return False
 
-        for wall in self.walls:
-            if self.line_intersects_rectangle(camera.x, camera.y, x, y, wall):
-                return False
-                
-        angle_to_point = self.calculate_angle(camera, point)
+    # Check for intersection with walls
+        if any(self.line_intersects_rectangle(camera.x, camera.y, x, y, wall) for wall in self.walls):
+            return False
+
+        angle_to_point = self.calculate_angle(camera, point) % 360
         left_angle, right_angle = camera.get_field_of_view()
 
-        angle_to_point = angle_to_point % 360
-        left_angle = left_angle % 360
-        right_angle = right_angle % 360
+    # Normalize camera angles
+        left_angle %= 360
+        right_angle %= 360
 
+    # Check if the angle to the point is within the camera's field of view
         if left_angle < right_angle:
             return left_angle <= angle_to_point <= right_angle
         else:
+        # Handle wrap-around case
             return angle_to_point >= left_angle or angle_to_point <= right_angle
 
     def calculate_angle(self, camera, point):
