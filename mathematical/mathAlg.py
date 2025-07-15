@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt  # Importer la bibliothèque pyplot de matplotli
 import matplotlib.patches as patches
 import numpy as np  # Importer numpy pour la manipulation de tableaux numériques
 class Room:
-    def __init__(self, name, length, width, walls=None):
+    def __init__(self, name, length, width, walls=None, zones=None):
         self.name = name
         self.length = int(length)
         self.width = int(width)
@@ -16,7 +16,9 @@ class Room:
         ]
         if walls is not None:
             self.walls.extend(walls)  # Add additional walls if provided
+        self.zones=zones
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
+
     def area(self):
         return self.length * self.width
 
@@ -324,6 +326,21 @@ class Camera:
                 f"angle_of_sight={self.angle_of_sight}°, "
                 f"range={self.range})")
 
+class Zone:
+    def __init__(self, name: str, x1: int, y1: int, x2: int, y2: int):
+        self.name = name
+        self.blc = (x1, y1)  # Bottom left corner
+        self.brc = (x2, y1)  # Bottom right corner
+        self.tlc = (x1, y2)  # Top left corner
+        self.trc = (x2, y2)  # Top right corner
+        self.length = x2 - x1
+        self.width = y2 - y1
+
+    def __repr__(self):
+        return (f"Zone(name={self.name}, "
+                f"blc={self.blc}, brc={self.brc}, "
+                f"tlc={self.tlc}, trc={self.trc}), "
+                f"tlc={self.length}, trc={self.width})")
 
 
 

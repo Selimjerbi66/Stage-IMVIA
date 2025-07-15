@@ -1,13 +1,13 @@
 from lab_builder import *
 
-json_file_path = "labo.json"  # Replace with your JSON file path
+json_file_path = "roomexp.json"  # Replace with your JSON file path
 result = process_room_file(json_file_path)
 room = setUpLab(result)
 fig, ax = plt.subplots(figsize=(room.length,room.width))  # Width: 10 inches, Height: 6 inches
 for i in range(len(room.walls)):
     print(room.walls[i])
     # Create a rectangle patch
-    rectangle = patches.Rectangle(
+    wall_rectangle = patches.Rectangle(
         (room.walls[i].xbl, room.walls[i].ybl),     # Bottom-left corner coordinates
         room.walls[i].length,         # Length of the rectangle
         room.walls[i].width,          # Width of the rectangle
@@ -17,7 +17,22 @@ for i in range(len(room.walls)):
     )
 
     # Add the rectangle patch to the axes
-    ax.add_patch(rectangle)
+    ax.add_patch(wall_rectangle)
+
+
+# Draw zones
+for zone in room.zones:
+    # Create a rectangle patch for each zone
+    zone_rectangle = patches.Rectangle(
+        (zone.blc[0], zone.blc[1]),  # Bottom-left corner coordinates
+        zone.length,                 # Length of the rectangle
+        zone.width,                  # Width of the rectangle
+        linewidth=1,                 # Thickness of the rectangle's edge
+        edgecolor=hex_codes[5],      # Edge color for zones
+        facecolor=hex_codes[5]       # Fill color for zones
+    )
+    ax.add_patch(zone_rectangle)
+
 cameras = setUpCameras(process_cameras_file("surveillance.json"), room)
 # Loop through each point in the matrix
 

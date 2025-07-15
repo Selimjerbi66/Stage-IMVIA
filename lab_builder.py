@@ -2,16 +2,14 @@ from files.room_reader import *
 from files.camera_reader import *
 from mathematical.mathAlg import *
 def setUpLab(matrix):
-    Walls=[]
-    x=0
-    for i in matrix[2]:
-        '''print (x)'''
-        Walls.append(Wall(i[0],i[1],i[2],i[3],i[4],i[5]))
-        '''print(Wall(i[0],i[1],i[2],i[3],i[4],i[5]))'''
-        x+=1
-    Room(matrix[0],matrix[1][0],matrix[1][1],Walls)
-    '''print(Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls))'''
-    return Room(matrix[0],int(matrix[1][0]),int(matrix[1][1]),Walls)
+    # Create Wall objects using a list comprehension
+    Walls = [Wall(wall_data[0], wall_data[1], wall_data[2], wall_data[3], wall_data[4], wall_data[5]) for wall_data in matrix[2]]
+    
+    # Create Zone objects from the matrix[3]
+    Zones = [Zone(zone_data[0], zone_data[1], zone_data[2], zone_data[3], zone_data[4]) for zone_data in matrix[3]]
+    
+    # Create and return the Room object
+    return Room(matrix[0], int(matrix[1][0]), int(matrix[1][1]), Walls, Zones)
 def setUpCameras(matrix, Room):
     Cameras=[]
     test = True
