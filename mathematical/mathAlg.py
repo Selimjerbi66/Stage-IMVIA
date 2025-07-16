@@ -336,6 +336,15 @@ class Zone:
         self.length = x2 - x1
         self.width = y2 - y1
 
+    def zone_points(self):
+        """Generate a list of all points within the zone's rectangle using blc, length, and width."""
+        blc = self.blc
+        length = self.length
+        width = self.width
+    
+        return [(x, y) for x in range(blc[0], blc[0] + length + 1) 
+                    for y in range(blc[1], blc[1] + width + 1)]
+
     def __repr__(self):
         return (f"Zone(name={self.name}, "
                 f"blc={self.blc}, brc={self.brc}, "
