@@ -330,9 +330,6 @@ class Zone:
     def __init__(self, name: str, x1: int, y1: int, x2: int, y2: int):
         self.name = name
         self.blc = (x1, y1)  # Bottom left corner
-        self.brc = (x2, y1)  # Bottom right corner
-        self.tlc = (x1, y2)  # Top left corner
-        self.trc = (x2, y2)  # Top right corner
         self.length = x2 - x1
         self.width = y2 - y1
 
