@@ -2,8 +2,7 @@ from lab_builder import *  # Ensure this module contains necessary functions and
 
 def plotLab(room, cameras, viewable):
     # Create figure and axis
-    fig, ax = plt.subplots(figsize=(room.length, room.width))
-
+    _, ax = plt.subplots(figsize=(room.length, room.width))
 
 # Draw zones
     for zone in room.zones:
@@ -17,6 +16,14 @@ def plotLab(room, cameras, viewable):
         facecolor=hex_codes[5]       # Fill color for zones
         )
         ax.add_patch(zone_rectangle)
+        ax.text(
+        zone.blc[0],                  # X position (bottom-left corner)
+        zone.blc[1],                  # Y position (bottom-left corner)
+        zone.name,                    # Zone name
+        ha='left',                    # Horizontal alignment
+        va='bottom',                  # Vertical alignment
+        color='white'                 # Text color (adjust as needed)
+        )
 
     # Draw the walls of the room using a collection
     wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0]) for wall in room.walls]
@@ -27,11 +34,15 @@ def plotLab(room, cameras, viewable):
     points = []
     colors = []
     sizes = []
-    
     for point, data in viewable.items():
-        x, y = point
-        n = len(data['cameras'])
-        color = hex_codes[n % len(hex_codes)]
+        x, y = point  # Unpack the point tuple
+        n = len(data['cameras'])  # Get the number of cameras for the point
+    
+        color = hex_codes[n % len(hex_codes)]  # Use original hex codes
+
+    # You can now use (x, y, color) as needed, e.g., for plotting
+
+        
         
         points.append((x, y))
         colors.append(color)

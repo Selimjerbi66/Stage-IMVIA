@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
-    QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit
+    QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit, QListWidget
 )
 from PyQt6.QtCore import Qt
 from lab_plotting import *  # Ensure this module contains necessary functions and classes
@@ -19,8 +19,10 @@ class MainWindow(QWidget):
         # Tabs
         self.tab_menu = self.setup_tab_menu()
         self.tab_view = self.setup_tab_view()
+        self.tab_zones = self.setup_tab_zones()  # New tab for zones
         self.tabs.addTab(self.tab_menu, "🏁 Menu")
         self.tabs.addTab(self.tab_view, "👁️ View")
+        self.tabs.addTab(self.tab_zones, "🗺️ Zones")  # Add the new tab
 
         layout.addWidget(self.tabs)
 
@@ -77,6 +79,29 @@ class MainWindow(QWidget):
         w.setLayout(layout)
         return w
 
+    def setup_tab_zones(self):
+        layout = QVBoxLayout()
+        
+        self.zone_list = QListWidget()  # List widget to display zone names
+        self.zone_list.itemClicked.connect(self.showZoneData)  # Connect click event
+        layout.addWidget(self.zone_list)
+
+        w = QWidget()
+        w.setLayout(layout)
+        return w
+
+    def showZoneData(self, item):
+        zone_name = item.text()  # Get the text of the clicked item
+        if zone_name in self.data:
+            visibility_rate = self.data[zone_name] * 100  # Convert to percentage
+        
+            if visibility_rate < 80:
+                self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone cannot be considered visible.")
+            else:
+                self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone is visible.")
+        else:
+            self.console.append(f"No data found for {zone_name}.")
+
     def roomCharge(self):
         # Open file dialog to load a room file
         self.json_lab_path, _ = QFileDialog.getOpenFileName(self, "Charger un bâtiment", "", "JSON Files (*.json);;All Files (*)")
@@ -90,16 +115,21 @@ class MainWindow(QWidget):
             self.console.append("Camera network loaded from: " + self.json_cam_path)
 
     def generatePointMatrix(self):
-    # Generate room and cameras
+        # Generate room and cameras
         try:
             self.room = setUpLab(process_room_file(self.json_lab_path))
             self.cameras = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
             self.viewable = self.room.point_matrix(self.cameras)
             self.console.append("Point matrix generated.")
         
-        # Use the zones from the room
+            # Use the zones from the room
             zones = self.room.zones
             self.data = zoneViewer(zones, self.viewable)  # Create self.data
+
+            # Populate the zone list in the zones tab
+            self.zone_list.clear()  # Clear previous entries
+            self.zone_list.addItems(self.data.keys())  # Add new zone names
+
             self.console.append(f"Visibility data stored in self.data: {self.data}")
         
         except Exception as e:

@@ -332,19 +332,19 @@ class Zone:
         self.blc = (x1, y1)  # Bottom left corner
         self.length = x2 - x1
         self.width = y2 - y1
+        self.points=self.zone_points()
 
     def zone_points(self):
         """Generate a list of all points within the zone's rectangle using blc, length, and width."""
         blc = self.blc
         length = self.length
         width = self.width
-    
         return [(x, y) for x in range(blc[0], blc[0] + length + 1) 
                     for y in range(blc[1], blc[1] + width + 1)]
 
     def visibility_rate(self, matrix):
         """Calculate the visibility rate of the zone based on the given matrix."""
-        total_points = self.zone_points()
+        total_points = self.points
         visible_points_count = 0
 
         for point in total_points:
@@ -366,10 +366,23 @@ class Zone:
                 f"tlc={self.length}, trc={self.width})")
 
 
+hex_codes_new = [
+    '#8B4513',  # Saddle Brown
+    '#2E8B57',  # Sea Green
+    '#4682B4',  # Steel Blue
+    '#DAA520',  # Goldenrod
+    '#8A2BE2',  # Blue Violet
+    '#FF6347',  # Tomato
+    '#7FFF00',  # Chartreuse
+    '#FF69B4',  # Hot Pink
+    '#6A5ACD',  # Slate Blue
+    '#D2691E',  # Chocolate
+    '#20B2AA',  # Light Sea Green
+    '#FFB6C1'   # Light Pink
+]
 
 hex_codes = [
     '#000000',  # Black (lowest intensity)
-    '#0000FF',  # Blue
     '#00FFFF',  # Cyan
     '#00FF00',  # Green
     '#FFFF00',  # Yellow
