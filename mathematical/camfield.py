@@ -16,3 +16,18 @@ def zoneViewer(zones, matrix):
     for zone in zones:
         data[zone.name]=zone.visibility_rate(matrix)
     return data
+def zoned(zones, point):
+    """
+    Check if the given point is within any of the specified zones.
+
+    Args:
+        zones (list): A list of Zone objects.
+        point (tuple): A tuple representing the point (x, y).
+
+    Returns:
+        bool: True if the point is within any zone, False otherwise.
+    """
+    for zone in zones:
+        if zone.interval(point):
+            return True
+    return False

@@ -357,6 +357,20 @@ class Zone:
         else:
             return 0  # Avoid division by zero if there are no points
 
+    def interval(self, point):
+        """
+        Check if the given point (x, y) is within the zone.
+
+        Args:
+            point (tuple): A tuple representing the point (x, y).
+
+        Returns:
+            bool: True if the point is within the zone, False otherwise.
+        """
+        x, y = point
+        return (self.blc[0] <= x <= self.blc[0] + self.length) and \
+               (self.blc[1] <= y <= self.blc[1] + self.width)
+
 
 
     def __repr__(self):

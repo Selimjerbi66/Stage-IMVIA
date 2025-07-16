@@ -23,7 +23,7 @@ def plotLab(room, cameras, viewable):
         ha='left',                    # Horizontal alignment
         va='bottom',                  # Vertical alignment
         color='white'                 # Text color (adjust as needed)
-        )
+    )
 
     # Draw the walls of the room using a collection
     wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0]) for wall in room.walls]
@@ -37,8 +37,10 @@ def plotLab(room, cameras, viewable):
     for point, data in viewable.items():
         x, y = point  # Unpack the point tuple
         n = len(data['cameras'])  # Get the number of cameras for the point
-    
-        color = hex_codes[n % len(hex_codes)]  # Use original hex codes
+        if zoned(room.zones,point):
+            color = hex_codes_new[n % len(hex_codes_new)]
+        else:
+            color = hex_codes[n % len(hex_codes)]  # Use original hex codes
 
     # You can now use (x, y, color) as needed, e.g., for plotting
 
