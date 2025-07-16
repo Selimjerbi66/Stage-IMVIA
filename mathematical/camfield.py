@@ -11,3 +11,8 @@ def camViewer(room, cameras):
         s.append((i.name,to_view))
         '''print(s)'''
     return (s)
+def zoneViewer(zones, matrix):
+    data=dict()
+    for zone in zones:
+        data[zone.name]=zone.visibility_rate(matrix)
+    return data

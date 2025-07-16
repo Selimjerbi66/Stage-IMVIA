@@ -4,11 +4,6 @@ def plotLab(room, cameras, viewable):
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(room.length, room.width))
 
-    # Draw the walls of the room using a collection
-    wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0]) for wall in room.walls]
-    for rectangle in wall_rectangles:
-        ax.add_patch(rectangle)
-
 
 # Draw zones
     for zone in room.zones:
@@ -22,6 +17,11 @@ def plotLab(room, cameras, viewable):
         facecolor=hex_codes[5]       # Fill color for zones
         )
         ax.add_patch(zone_rectangle)
+
+    # Draw the walls of the room using a collection
+    wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor=hex_codes[0], facecolor=hex_codes[0]) for wall in room.walls]
+    for rectangle in wall_rectangles:
+        ax.add_patch(rectangle)
 
     # Prepare to plot viewable points
     points = []

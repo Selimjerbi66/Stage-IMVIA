@@ -90,12 +90,18 @@ class MainWindow(QWidget):
             self.console.append("Camera network loaded from: " + self.json_cam_path)
 
     def generatePointMatrix(self):
-        # Generate room and cameras
+    # Generate room and cameras
         try:
             self.room = setUpLab(process_room_file(self.json_lab_path))
             self.cameras = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
             self.viewable = self.room.point_matrix(self.cameras)
             self.console.append("Point matrix generated.")
+        
+        # Use the zones from the room
+            zones = self.room.zones
+            self.data = zoneViewer(zones, self.viewable)  # Create self.data
+            self.console.append(f"Visibility data stored in self.data: {self.data}")
+        
         except Exception as e:
             self.console.append(f"Error generating point matrix: {e}")
 
