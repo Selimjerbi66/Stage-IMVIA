@@ -34,7 +34,7 @@ def ConnectedCams(room, d, w):
     walls = room.walls
     camera_names = [camera.name for camera in cameras]
     camera_points = {camera.name: (camera.x, camera.y) for camera in cameras}
-    ll = []
+    networks = []
     
     while camera_names:
         listcon = []
@@ -49,9 +49,9 @@ def ConnectedCams(room, d, w):
                 listcon.append(c2)
                 camera_names.remove(c2)
 
-        ll.append(listcon)
+        networks.append(listcon)
 
-    return ll
+    return networks
 
 
 
