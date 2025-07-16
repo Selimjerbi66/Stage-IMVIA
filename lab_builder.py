@@ -16,8 +16,9 @@ def setUpCameras(matrix, Room):
     rejected_list = []
     for i in matrix:
         test, rejected_list =Room.compatibleCamera(Camera(i[0],i[1],i[2],i[3],i[4],i[5]), rejected_list)
+        print(len(Cameras))
         if test:
-            Cameras.append(Camera(i[0], i[1], i[2], i[3], i[4], i[5]))
+            Cameras.append(Camera(i[0], i[1], i[2], i[3], i[4], i[5], len(Cameras)))
         '''print(Camera(i[0],i[1],i[2],i[3],i[4],i[5]))'''
     '''if len(rejected_list) != 0:
         print("here is the list of rejected cameras due to their positions")

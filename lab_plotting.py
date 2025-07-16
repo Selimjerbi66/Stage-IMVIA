@@ -34,9 +34,9 @@ def plotLab(room, cameras, viewable):
     points = []
     colors = []
     sizes = []
-    for point, data in viewable.items():
+    for point, _ in viewable.items():
         x, y = point  # Unpack the point tuple
-        n = len(data['cameras'])  # Get the number of cameras for the point
+        n = closeCam(point, viewable, cameras)
         if zoned(room.zones,point):
             color = hex_codes_new[n % len(hex_codes_new)]
         else:

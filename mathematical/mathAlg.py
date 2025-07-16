@@ -304,7 +304,7 @@ def corners_coordinates(length, width, bottom_left_x, bottom_left_y):
     
     return [bl, br, ur, ul]
 class Camera:
-    def __init__(self, name, x, y, orientation, angle_of_sight, range):
+    def __init__(self, name, x, y, orientation, angle_of_sight, range, index=0):
         self.name = name
         self.x = x
         self.y = y
@@ -312,6 +312,7 @@ class Camera:
         self.orientation = orientation
         self.angle_of_sight = angle_of_sight
         self.range = range
+        self.index=index
 
     def get_field_of_view(self):
         half_sight = self.angle_of_sight / 2
