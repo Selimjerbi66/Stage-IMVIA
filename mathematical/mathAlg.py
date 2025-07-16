@@ -345,6 +345,23 @@ class Zone:
         return [(x, y) for x in range(blc[0], blc[0] + length + 1) 
                     for y in range(blc[1], blc[1] + width + 1)]
 
+    def visibility_rate(self, matrix):
+        """Calculate the visibility rate of the zone based on the given matrix."""
+        total_points = self.zone_points()
+        visible_points_count = 0
+
+        for point in total_points:
+            if point in matrix:
+                visible_points_count += 1  # Count the point if it's in the matrix
+
+        # Calculate visibility rate
+        if total_points:
+            return visible_points_count / len(total_points)  # Return the rate
+        else:
+            return 0  # Avoid division by zero if there are no points
+
+
+
     def __repr__(self):
         return (f"Zone(name={self.name}, "
                 f"blc={self.blc}, brc={self.brc}, "
