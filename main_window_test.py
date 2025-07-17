@@ -104,8 +104,8 @@ class MainWindow(QWidget):
 
         # Input for obstacle interference
         self.obstacle_interference_input = QLineEdit()
-        self.obstacle_interference_input.setPlaceholderText("exp : 50")  # Just added
-        layout.addWidget(QLabel("Obstacle Interference"))  # Just added
+        self.obstacle_interference_input.setPlaceholderText("exp : 10")  # Just added
+        layout.addWidget(QLabel("Obstacle Interference (%)"))  # Just added
         layout.addWidget(self.obstacle_interference_input)  # Just added
 
         # Button for connectivity check

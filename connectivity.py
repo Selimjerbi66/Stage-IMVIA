@@ -30,28 +30,43 @@
             i+=1
     return (ll)'''
 def ConnectedCams(room, cameras, d, w):
-    cameras
-    walls = room.walls
-    camera_names = [camera.name for camera in cameras]
-    camera_points = {camera.name: (camera.x, camera.y) for camera in cameras}
-    networks = []
-    
-    while camera_names:
-        listcon = []
-        c = camera_names[0]
-        listcon.append(c)
-        camera_names.remove(c)
+    try:
+        # Ensure w is less than or equal to 100
+        if w > 100:
+            raise ValueError("w must be less than or equal to 100.")
 
-        for c2 in camera_names[:]:  # Create a copy of the list to avoid modification issues
-            q = obs(camera_points[c], camera_points[c2], walls, room)
-            effective_distance = dist(camera_points[c], camera_points[c2]) + q * w
-            if effective_distance <= d:
-                listcon.append(c2)
-                camera_names.remove(c2)
+        walls = room.walls
+        camera_names = [camera.name for camera in cameras]
+        camera_points = {camera.name: (camera.x, camera.y) for camera in cameras}
+        networks = []
 
-        networks.append(listcon)
+        while camera_names:
+            listcon = []
+            c = camera_names[0]
+            listcon.append(c)
+            camera_names.remove(c)
 
-    return networks, camera_points
+            for c2 in camera_names[:]:  # Create a copy of the list to avoid modification issues
+                q = obs(camera_points[c], camera_points[c2], walls, room)
+                print('q = ',q,'and w = ',w)
+                total_interference = (1 - w / 100) ** q
+                print('interference = ' , total_interference)
+                distance = dist(camera_points[c], camera_points[c2])
+
+                effective_connectivity_distance = d * total_interference
+                print('distance = ',distance)
+                print('effective_distance = ',effective_connectivity_distance)
+                if distance <= effective_connectivity_distance:
+                    listcon.append(c2)
+                    camera_names.remove(c2)
+
+            networks.append(listcon)
+
+        return networks, camera_points
+
+    except ValueError as e:
+        print(f"ValueError: {e}")
+        return [], {}
 
 
 
@@ -67,4 +82,3 @@ def obs(p1,p2,walls,room):
             count += 1
 
     return count
-
