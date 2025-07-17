@@ -1,9 +1,10 @@
 from PyQt6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
+    QWidget, QVBoxLayout, QTabWidget,
     QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit, QListWidget
 )
 from PyQt6.QtCore import Qt
 from lab_plotting import *  # Ensure this module contains necessary functions and classes
+from connectivity import *  # Ensure this imports ConnectedCams
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -23,6 +24,8 @@ class MainWindow(QWidget):
         self.tabs.addTab(self.tab_menu, "🏁 Menu")
         self.tabs.addTab(self.tab_view, "👁️ View")
         self.tabs.addTab(self.tab_zones, "🗺️ Zones")  # Add the new tab
+        self.tab_network = self.setup_tab_network()  # Just added
+        self.tabs.addTab(self.tab_network, "🌐 Network")
 
         layout.addWidget(self.tabs)
 
@@ -41,16 +44,16 @@ class MainWindow(QWidget):
 
         # Buttons to load files
         room_charge = QPushButton("🔌 Load Building")
-        room_charge.clicked.connect(self.roomCharge)
+        room_charge.clicked.connect(self.roomCharge)  # Corrected
         camera_charge = QPushButton("❎ Load Cameras")
-        camera_charge.clicked.connect(self.cameraCharge)
+        camera_charge.clicked.connect(self.cameraCharge)  # Corrected
 
         layout.addWidget(room_charge)
         layout.addWidget(camera_charge)
 
         # Generate Point Matrix button
         generate_matrix = QPushButton("📊 Generate Point Matrix")
-        generate_matrix.clicked.connect(self.generatePointMatrix)
+        generate_matrix.clicked.connect(self.generatePointMatrix)  # Corrected
         layout.addWidget(generate_matrix)
 
         w = QWidget()
@@ -89,6 +92,70 @@ class MainWindow(QWidget):
         w = QWidget()
         w.setLayout(layout)
         return w
+
+    def setup_tab_network(self):
+        layout = QVBoxLayout()
+
+        # Input for maximum connectivity distance
+        self.connectivity_distance_input = QLineEdit()
+        self.connectivity_distance_input.setPlaceholderText("exp : 200")  # Just added
+        layout.addWidget(QLabel("Maximum Connectivity Distance"))  # Just added
+        layout.addWidget(self.connectivity_distance_input)  # Just added
+
+        # Input for obstacle interference
+        self.obstacle_interference_input = QLineEdit()
+        self.obstacle_interference_input.setPlaceholderText("exp : 50")  # Just added
+        layout.addWidget(QLabel("Obstacle Interference"))  # Just added
+        layout.addWidget(self.obstacle_interference_input)  # Just added
+
+        # Button for connectivity check
+        connectivity_check_button = QPushButton("Connectivity Check")  # Just added
+        connectivity_check_button.clicked.connect(self.checkConnectivity)  # Just added
+        layout.addWidget(connectivity_check_button)  # Just added
+
+        # List to display networks
+        self.network_list = QListWidget()  # Just added
+        self.network_list.itemClicked.connect(self.showNetworkData)  # Just added
+        layout.addWidget(self.network_list)  # Just added
+
+        w = QWidget()
+        w.setLayout(layout)
+        return w
+
+    # Just added: Function to check connectivity
+    def checkConnectivity(self):
+        try:
+            # Retrieve inputs
+            max_distance = int(self.connectivity_distance_input.text())  # Just added
+            obstacle_interference = int(self.obstacle_interference_input.text())  # Just added
+
+            # Call ConnectedCams function
+            self.networks, self.camera_coordinates = ConnectedCams(self.room, self.cameras, max_distance, obstacle_interference)  # Just added
+
+            # Populate the network list
+            self.network_list.clear()  # Just added
+            for i, network in enumerate(self.networks):
+                self.network_list.addItem(f"Network {i + 1}")  # Just added
+            
+            self.console.append("Connectivity check completed.")  # Just added
+
+        except Exception as e:
+            self.console.append(f"Error during connectivity check: {e}")  # Just added
+
+    # Just added: Function to show network data
+    def showNetworkData(self, item):
+        network_index = self.network_list.row(item)  # Get the index of the clicked network
+        network = self.networks[network_index]  # Get the cameras in this network
+
+        camera_info = []  # Just added: Initialize a list to store camera info
+        for cam in network:
+            if cam in self.camera_coordinates:  # Just added: Check if the camera exists in the coordinates
+                camera_info.append(f"{cam}: {self.camera_coordinates[cam]}")  # Just added
+
+        if camera_info:
+            self.console.append(f"Network {network_index + 1} Cameras: {', '.join(camera_info)}")  # Just added
+        else:
+            self.console.append(f"No cameras found in Network {network_index + 1}.")  # Just added
 
     def showZoneData(self, item):
         zone_name = item.text()  # Get the text of the clicked item

@@ -29,8 +29,8 @@
                     cams.remove(c2)
             i+=1
     return (ll)'''
-def ConnectedCams(room, d, w):
-    cameras = room.cameras
+def ConnectedCams(room, cameras, d, w):
+    cameras
     walls = room.walls
     camera_names = [camera.name for camera in cameras]
     camera_points = {camera.name: (camera.x, camera.y) for camera in cameras}
@@ -51,7 +51,7 @@ def ConnectedCams(room, d, w):
 
         networks.append(listcon)
 
-    return networks
+    return networks, camera_points
 
 
 
