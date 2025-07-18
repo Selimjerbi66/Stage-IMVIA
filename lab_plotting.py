@@ -73,3 +73,46 @@ def plotLab(room, cameras, viewable):
 
     # Display the plot
     plt.show()
+
+def plotConnectivity(room, camera_points, camera_proxi):
+    # Create figure and axis
+    _, ax = plt.subplots(figsize=(room.length, room.width))
+
+    # Draw walls of the room
+    wall_rectangles = [patches.Rectangle((wall.xbl, wall.ybl), wall.length, wall.width, linewidth=1, edgecolor='black', facecolor='black') for wall in room.walls]
+    for rectangle in wall_rectangles:
+        ax.add_patch(rectangle)
+
+    # Plot cameras
+    camera_positions = [(camera_points[name][0], camera_points[name][1]) for name in camera_points]
+    camera_names = list(camera_points.keys())
+    
+    # Scatter camera positions
+    ax.scatter(*zip(*camera_positions), color='red', s=50)  # Larger size for visibility
+    print(camera_proxi)
+    # Draw links between cameras and annotate with distance, effective distance, and obstacles
+    for camera_name, links in camera_proxi.items():
+        for linked_camera, distance, effective_distance, obstacles in links:
+            if distance <= effective_distance:
+                # Get the positions
+                pos1 = camera_points[camera_name]
+                pos2 = camera_points[linked_camera]
+
+            # Draw the line between the two cameras
+                ax.plot([pos1[0], pos2[0]], [pos1[1], pos2[1]], color='blue', linestyle='--', alpha=0.5)
+
+            # Annotate with distance, effective distance, and obstacles
+                mid_x = (pos1[0] + pos2[0]) / 2
+                mid_y = (pos1[1] + pos2[1]) / 2
+                annotation = f'Dist: {distance:.2f}, Eff: {effective_distance:.2f}, Obst: {obstacles}'
+                ax.text(mid_x, mid_y, annotation, fontsize=8, ha='center', va='center')
+
+    # Set limits, labels, and title
+    ax.set_xlim(-1, room.length + 1)
+    ax.set_ylim(-1, room.width + 1)
+    ax.set_xlabel('X-axis')
+    ax.set_ylabel('Y-axis')
+    ax.set_title(f'Connectivity Network Inside {room.name}')
+
+    # Display the plot
+    plt.show()

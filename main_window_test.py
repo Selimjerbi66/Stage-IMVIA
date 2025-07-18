@@ -16,7 +16,7 @@ class MainWindow(QWidget):
     def setup_ui(self):
         layout = QVBoxLayout()
         self.tabs = QTabWidget()
-        
+
         # Tabs
         self.tab_menu = self.setup_tab_menu()
         self.tab_view = self.setup_tab_view()
@@ -24,7 +24,7 @@ class MainWindow(QWidget):
         self.tabs.addTab(self.tab_menu, "🏁 Menu")
         self.tabs.addTab(self.tab_view, "👁️ View")
         self.tabs.addTab(self.tab_zones, "🗺️ Zones")  # Add the new tab
-        self.tab_network = self.setup_tab_network()  # Just added
+        self.tab_network = self.setup_tab_network()  # Added network tab
         self.tabs.addTab(self.tab_network, "🌐 Network")
 
         layout.addWidget(self.tabs)
@@ -44,16 +44,16 @@ class MainWindow(QWidget):
 
         # Buttons to load files
         room_charge = QPushButton("🔌 Load Building")
-        room_charge.clicked.connect(self.roomCharge)  # Corrected
+        room_charge.clicked.connect(self.roomCharge)
         camera_charge = QPushButton("❎ Load Cameras")
-        camera_charge.clicked.connect(self.cameraCharge)  # Corrected
+        camera_charge.clicked.connect(self.cameraCharge)
 
         layout.addWidget(room_charge)
         layout.addWidget(camera_charge)
 
         # Generate Point Matrix button
         generate_matrix = QPushButton("📊 Generate Point Matrix")
-        generate_matrix.clicked.connect(self.generatePointMatrix)  # Corrected
+        generate_matrix.clicked.connect(self.generatePointMatrix)
         layout.addWidget(generate_matrix)
 
         w = QWidget()
@@ -118,49 +118,53 @@ class MainWindow(QWidget):
         self.network_list.itemClicked.connect(self.showNetworkData)  # Just added
         layout.addWidget(self.network_list)  # Just added
 
+        # Button to plot connectivity
+        plot_connectivity_button = QPushButton("Plot Connectivity")  # Added
+        plot_connectivity_button.clicked.connect(self.plotConnectivity)  # Connect to new method
+        layout.addWidget(plot_connectivity_button)  # Add button to the layout
+
         w = QWidget()
         w.setLayout(layout)
         return w
 
-    # Just added: Function to check connectivity
     def checkConnectivity(self):
         try:
             # Retrieve inputs
-            max_distance = int(self.connectivity_distance_input.text())  # Just added
-            obstacle_interference = int(self.obstacle_interference_input.text())  # Just added
+            max_distance = int(self.connectivity_distance_input.text())
+            obstacle_interference = int(self.obstacle_interference_input.text())
 
             # Call ConnectedCams function
-            self.networks, self.camera_coordinates = ConnectedCams(self.room, self.cameras, max_distance, obstacle_interference)  # Just added
+            self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
+                self.room, self.cameras, max_distance, obstacle_interference)  # Updated
 
             # Populate the network list
-            self.network_list.clear()  # Just added
+            self.network_list.clear()
             for i, network in enumerate(self.networks):
-                self.network_list.addItem(f"Network {i + 1}")  # Just added
-            
-            self.console.append("Connectivity check completed.")  # Just added
+                self.network_list.addItem(f"Network {i + 1}")
+
+            self.console.append("Connectivity check completed.")
 
         except Exception as e:
-            self.console.append(f"Error during connectivity check: {e}")  # Just added
+            self.console.append(f"Error during connectivity check: {e}")
 
-    # Just added: Function to show network data
     def showNetworkData(self, item):
-        network_index = self.network_list.row(item)  # Get the index of the clicked network
-        network = self.networks[network_index]  # Get the cameras in this network
+        network_index = self.network_list.row(item)
+        network = self.networks[network_index]
 
-        camera_info = []  # Just added: Initialize a list to store camera info
+        camera_info = []
         for cam in network:
-            if cam in self.camera_coordinates:  # Just added: Check if the camera exists in the coordinates
-                camera_info.append(f"{cam}: {self.camera_coordinates[cam]}")  # Just added
+            if cam in self.camera_coordinates:
+                camera_info.append(f"{cam}: {self.camera_coordinates[cam]}")
 
         if camera_info:
-            self.console.append(f"Network {network_index + 1} Cameras: {', '.join(camera_info)}")  # Just added
+            self.console.append(f"Network {network_index + 1} Cameras: {', '.join(camera_info)}")
         else:
-            self.console.append(f"No cameras found in Network {network_index + 1}.")  # Just added
+            self.console.append(f"No cameras found in Network {network_index + 1}.")
 
     def showZoneData(self, item):
-        zone_name = item.text()  # Get the text of the clicked item
+        zone_name = item.text()
         if zone_name in self.data:
-            visibility_rate = self.data[zone_name] * 100  # Convert to percentage
+            visibility_rate = self.data[zone_name] * 100
         
             if visibility_rate < 80:
                 self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone cannot be considered visible.")
@@ -170,32 +174,27 @@ class MainWindow(QWidget):
             self.console.append(f"No data found for {zone_name}.")
 
     def roomCharge(self):
-        # Open file dialog to load a room file
         self.json_lab_path, _ = QFileDialog.getOpenFileName(self, "Charger un bâtiment", "", "JSON Files (*.json);;All Files (*)")
         if self.json_lab_path:
             self.console.append("Room loaded from: " + self.json_lab_path)
 
     def cameraCharge(self):
-        # Open file dialog to load a camera file
         self.json_cam_path, _ = QFileDialog.getOpenFileName(self, "Charger un réseau de caméras", "", "JSON Files (*.json);;All Files (*)")
         if self.json_cam_path:
             self.console.append("Camera network loaded from: " + self.json_cam_path)
 
     def generatePointMatrix(self):
-        # Generate room and cameras
         try:
             self.room = setUpLab(process_room_file(self.json_lab_path))
             self.cameras = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
             self.viewable = self.room.point_matrix(self.cameras)
             self.console.append("Point matrix generated.")
         
-            # Use the zones from the room
             zones = self.room.zones
-            self.data = zoneViewer(zones, self.viewable)  # Create self.data
+            self.data = zoneViewer(zones, self.viewable)
 
-            # Populate the zone list in the zones tab
-            self.zone_list.clear()  # Clear previous entries
-            self.zone_list.addItems(self.data.keys())  # Add new zone names
+            self.zone_list.clear()
+            self.zone_list.addItems(self.data.keys())
 
             self.console.append(f"Visibility data stored in self.data: {self.data}")
         
@@ -204,17 +203,14 @@ class MainWindow(QWidget):
 
     def selectPoint(self):
         input_text = self.ip_input.text()
-        # Validate input format
         if not (input_text.startswith("(") and input_text.endswith(")")):
             self.console.append("Error: Input must be in the format (x,y).")
             return
 
         try:
-            # Extract x and y values
             x_str, y_str = input_text[1:-1].split(",")
             x, y = int(x_str), int(y_str)
 
-            # Create tuple and check in viewable
             point = (x, y)
             if point in self.viewable:
                 self.console.append(f"Point {point} data: {self.viewable[point]}")
@@ -226,5 +222,8 @@ class MainWindow(QWidget):
             self.console.append(f"Unexpected error: {e}")
 
     def plotLab(self):
-        # Call the plotLab function with room, cameras, and viewable
         plotLab(self.room, self.cameras, self.viewable)
+
+    def plotConnectivity(self):
+        # Call the plotConnectivity function with the room, camera points, and camera proxi
+        plotConnectivity(self.room, self.camera_coordinates, self.camera_proxi)  # Updated
