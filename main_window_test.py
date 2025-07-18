@@ -98,30 +98,30 @@ class MainWindow(QWidget):
 
         # Input for maximum connectivity distance
         self.connectivity_distance_input = QLineEdit()
-        self.connectivity_distance_input.setPlaceholderText("exp : 200")  # Just added
-        layout.addWidget(QLabel("Maximum Connectivity Distance"))  # Just added
-        layout.addWidget(self.connectivity_distance_input)  # Just added
+        self.connectivity_distance_input.setPlaceholderText("exp : 200")
+        layout.addWidget(QLabel("Maximum Connectivity Distance"))
+        layout.addWidget(self.connectivity_distance_input)
 
         # Input for obstacle interference
         self.obstacle_interference_input = QLineEdit()
-        self.obstacle_interference_input.setPlaceholderText("exp : 10")  # Just added
-        layout.addWidget(QLabel("Obstacle Interference (%)"))  # Just added
-        layout.addWidget(self.obstacle_interference_input)  # Just added
+        self.obstacle_interference_input.setPlaceholderText("exp : 10")
+        layout.addWidget(QLabel("Obstacle Interference (%)"))
+        layout.addWidget(self.obstacle_interference_input)
 
         # Button for connectivity check
-        connectivity_check_button = QPushButton("Connectivity Check")  # Just added
-        connectivity_check_button.clicked.connect(self.checkConnectivity)  # Just added
-        layout.addWidget(connectivity_check_button)  # Just added
+        connectivity_check_button = QPushButton("Connectivity Check")
+        connectivity_check_button.clicked.connect(self.checkConnectivity)
+        layout.addWidget(connectivity_check_button)
 
         # List to display networks
-        self.network_list = QListWidget()  # Just added
-        self.network_list.itemClicked.connect(self.showNetworkData)  # Just added
-        layout.addWidget(self.network_list)  # Just added
+        self.network_list = QListWidget()
+        self.network_list.itemClicked.connect(self.showNetworkData)
+        layout.addWidget(self.network_list)
 
         # Button to plot connectivity
-        plot_connectivity_button = QPushButton("Plot Connectivity")  # Added
-        plot_connectivity_button.clicked.connect(self.plotConnectivity)  # Connect to new method
-        layout.addWidget(plot_connectivity_button)  # Add button to the layout
+        plot_connectivity_button = QPushButton("Plot Connectivity")
+        plot_connectivity_button.clicked.connect(self.plotConnectivity)
+        layout.addWidget(plot_connectivity_button)
 
         w = QWidget()
         w.setLayout(layout)
@@ -135,7 +135,7 @@ class MainWindow(QWidget):
 
             # Call ConnectedCams function
             self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
-                self.room, self.cameras, max_distance, obstacle_interference)  # Updated
+                self.room, self.cameras, max_distance, obstacle_interference)
 
             # Populate the network list
             self.network_list.clear()
@@ -144,6 +144,8 @@ class MainWindow(QWidget):
 
             self.console.append("Connectivity check completed.")
 
+        except ValueError:
+            self.console.append("Error: Please enter valid integers for distance and interference.")
         except Exception as e:
             self.console.append(f"Error during connectivity check: {e}")
 
@@ -174,14 +176,20 @@ class MainWindow(QWidget):
             self.console.append(f"No data found for {zone_name}.")
 
     def roomCharge(self):
-        self.json_lab_path, _ = QFileDialog.getOpenFileName(self, "Charger un bâtiment", "", "JSON Files (*.json);;All Files (*)")
-        if self.json_lab_path:
-            self.console.append("Room loaded from: " + self.json_lab_path)
+        try:
+            self.json_lab_path, _ = QFileDialog.getOpenFileName(self, "Charger un bâtiment", "", "JSON Files (*.json);;All Files (*)")
+            if self.json_lab_path:
+                self.console.append("Room loaded from: " + self.json_lab_path)
+        except Exception as e:
+            self.console.append(f"Error loading building: {e}")
 
     def cameraCharge(self):
-        self.json_cam_path, _ = QFileDialog.getOpenFileName(self, "Charger un réseau de caméras", "", "JSON Files (*.json);;All Files (*)")
-        if self.json_cam_path:
-            self.console.append("Camera network loaded from: " + self.json_cam_path)
+        try:
+            self.json_cam_path, _ = QFileDialog.getOpenFileName(self, "Charger un réseau de caméras", "", "JSON Files (*.json);;All Files (*)")
+            if self.json_cam_path:
+                self.console.append("Camera network loaded from: " + self.json_cam_path)
+        except Exception as e:
+            self.console.append(f"Error loading camera network: {e}")
 
     def generatePointMatrix(self):
         try:
@@ -222,8 +230,14 @@ class MainWindow(QWidget):
             self.console.append(f"Unexpected error: {e}")
 
     def plotLab(self):
-        plotLab(self.room, self.cameras, self.viewable)
+        try:
+            plotLab(self.room, self.cameras, self.viewable)
+        except Exception as e:
+            self.console.append(f"Error plotting lab: {e}")
 
     def plotConnectivity(self):
-        # Call the plotConnectivity function with the room, camera points, and camera proxi
-        plotConnectivity(self.room, self.camera_coordinates, self.camera_proxi)  # Updated
+        try:
+            # Call the plotConnectivity function with the room, camera points, and camera proxi
+            plotConnectivity(self.room, self.camera_coordinates, self.camera_proxi)
+        except Exception as e:
+            self.console.append(f"Error plotting connectivity: {e}")
