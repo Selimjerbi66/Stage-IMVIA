@@ -11,6 +11,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Simulation de caméras de surveillance")
         self.setMinimumSize(600, 900)
+        self.current_rate = 80  # Initialize the default rate
         self.setup_ui()
 
     def setup_ui(self):
@@ -20,11 +21,12 @@ class MainWindow(QWidget):
         # Tabs
         self.tab_menu = self.setup_tab_menu()
         self.tab_view = self.setup_tab_view()
-        self.tab_zones = self.setup_tab_zones()  # New tab for zones
+        self.tab_zones = self.setup_tab_zones()
+        self.tab_network = self.setup_tab_network()
+
         self.tabs.addTab(self.tab_menu, "🏁 Menu")
         self.tabs.addTab(self.tab_view, "👁️ View")
-        self.tabs.addTab(self.tab_zones, "🗺️ Zones")  # Add the new tab
-        self.tab_network = self.setup_tab_network()  # Added network tab
+        self.tabs.addTab(self.tab_zones, "🗺️ Zones")
         self.tabs.addTab(self.tab_network, "🌐 Network")
 
         layout.addWidget(self.tabs)
@@ -43,9 +45,9 @@ class MainWindow(QWidget):
         layout.addWidget(ip_label)
 
         # Buttons to load files
-        room_charge = QPushButton("🔌 Load Building")
+        room_charge = QPushButton("🏢 Load Building")
         room_charge.clicked.connect(self.roomCharge)
-        camera_charge = QPushButton("❎ Load Cameras")
+        camera_charge = QPushButton("📷 Load Cameras")
         camera_charge.clicked.connect(self.cameraCharge)
 
         layout.addWidget(room_charge)
@@ -70,11 +72,11 @@ class MainWindow(QWidget):
 
         # Input for point selection
         self.ip_input = QLineEdit()
-        self.ip_input.setPlaceholderText("ex : (x,y)")
+        self.ip_input.setPlaceholderText("ex : x y")
         layout.addWidget(self.ip_input)
 
         # Button to select point
-        select_point = QPushButton("Select Point")
+        select_point = QPushButton("📍 Select Point")
         select_point.clicked.connect(self.selectPoint)
         layout.addWidget(select_point)
 
@@ -88,6 +90,16 @@ class MainWindow(QWidget):
         self.zone_list = QListWidget()  # List widget to display zone names
         self.zone_list.itemClicked.connect(self.showZoneData)  # Connect click event
         layout.addWidget(self.zone_list)
+
+        # Input for the rate
+        self.rate_input = QLineEdit()
+        self.rate_input.setPlaceholderText("Enter rate (0-100)")
+        layout.addWidget(self.rate_input)
+
+        # Button to apply the rate
+        apply_rate_button = QPushButton("✅ Apply Rate")
+        apply_rate_button.clicked.connect(self.applyRate)
+        layout.addWidget(apply_rate_button)
 
         w = QWidget()
         w.setLayout(layout)
@@ -109,7 +121,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.obstacle_interference_input)
 
         # Button for connectivity check
-        connectivity_check_button = QPushButton("Connectivity Check")
+        connectivity_check_button = QPushButton("🔍 Connectivity Check")
         connectivity_check_button.clicked.connect(self.checkConnectivity)
         layout.addWidget(connectivity_check_button)
 
@@ -119,7 +131,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.network_list)
 
         # Button to plot connectivity
-        plot_connectivity_button = QPushButton("Plot Connectivity")
+        plot_connectivity_button = QPushButton("🗺️ Plot Connectivity")
         plot_connectivity_button.clicked.connect(self.plotConnectivity)
         layout.addWidget(plot_connectivity_button)
 
@@ -163,12 +175,32 @@ class MainWindow(QWidget):
         else:
             self.console.append(f"No cameras found in Network {network_index + 1}.")
 
+    def applyRate(self):
+        input_rate = self.rate_input.text().strip()  # Get input and strip whitespace
+        default_rate = 80  # Default rate
+
+        if not input_rate:  # If input is empty, use default rate
+            self.current_rate = default_rate
+        else:
+            try:
+                rate = float(input_rate)  # Convert to float
+                if 0 <= rate <= 100:  # Check if the rate is between 0 and 100
+                    self.current_rate = rate
+                else:
+                    self.console.append("Rate must be between 0 and 100")
+                    return
+            except ValueError:
+                self.console.append("Invalid input: please enter a number.")
+                return
+
+        self.console.append(f"Rate applied: {self.current_rate}")
+
     def showZoneData(self, item):
         zone_name = item.text()
         if zone_name in self.data:
             visibility_rate = self.data[zone_name] * 100
         
-            if visibility_rate < 80:
+            if visibility_rate < self.current_rate:
                 self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone cannot be considered visible.")
             else:
                 self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone is visible.")
@@ -210,16 +242,19 @@ class MainWindow(QWidget):
             self.console.append(f"Error generating point matrix: {e}")
 
     def selectPoint(self):
-        input_text = self.ip_input.text()
-        if not (input_text.startswith("(") and input_text.endswith(")")):
-            self.console.append("Error: Input must be in the format (x,y).")
+        input_text = self.ip_input.text().strip()  # Strip leading/trailing whitespace
+        if ' ' not in input_text:
+            self.console.append("Error: Input must be in the format 'x y'.")
             return
 
         try:
-            x_str, y_str = input_text[1:-1].split(",")
+            x_str, y_str = input_text.split()
+        
+            # Convert to integers
             x, y = int(x_str), int(y_str)
 
-            point = (x, y)
+            point = (x, y)  # Create the point tuple
+            self.console.append(f"Selected point: {point}")
             if point in self.viewable:
                 self.console.append(f"Point {point} data: {self.viewable[point]}")
             else:

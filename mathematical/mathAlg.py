@@ -19,8 +19,8 @@ class Room:
         self.zones=zones
         self.points = [(x, y) for x in range(length + 1) for y in range(width + 1)]
 
-    def area(self):
-        return self.length * self.width
+    '''def area(self):
+        return self.length * self.width'''
 
     def approximate_points(self, camera):
         point_list = []
@@ -138,7 +138,7 @@ class Room:
                 self.do_lines_intersect(p3, p4, seg_start, seg_end) or
                 self.do_lines_intersect(p4, p1, seg_start, seg_end))
 
-    def check_alignments(self, cameras):
+    '''def check_alignments(self, cameras):
         camView = camViewer(self, cameras)
         file = open('undesired.txt', 'w')  # Open file for writing
         for camera_name, points in camView:
@@ -179,7 +179,7 @@ class Room:
         # Remove intermediary points from the list of points
             points[:] = [point for point in points if point not in to_remove]
 
-        return camView
+        return camView'''
 
     def point_matrix(self, cameras):
         matrix = {}
@@ -210,7 +210,7 @@ class Room:
                 return False, reject_list
 
         return True, reject_list
-    def compatibleCameraSet(self, cameras):
+    '''def compatibleCameraSet(self, cameras):
         reject_list = []  # Initialize the reject list
 
         for camera in cameras:
@@ -218,7 +218,7 @@ class Room:
             if not is_compatible:
                 return False  # Return False immediately if any camera is incompatible
 
-        return True  # All cameras are compatible
+        return True  # All cameras are compatible'''
 
     def __str__(self):
         return (f"Room(length={self.length}, width={self.width}, "

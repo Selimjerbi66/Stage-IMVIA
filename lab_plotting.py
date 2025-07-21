@@ -85,7 +85,6 @@ def plotConnectivity(room, camera_points, camera_proxi):
 
     # Plot cameras
     camera_positions = [(camera_points[name][0], camera_points[name][1]) for name in camera_points]
-    camera_names = list(camera_points.keys())
     
     # Scatter camera positions
     ax.scatter(*zip(*camera_positions), color='red', s=50)  # Larger size for visibility
@@ -105,7 +104,7 @@ def plotConnectivity(room, camera_points, camera_proxi):
                 mid_x = (pos1[0] + pos2[0]) / 2
                 mid_y = (pos1[1] + pos2[1]) / 2
                 annotation = f'Dist: {distance:.2f}, Eff: {effective_distance:.2f}, Obst: {obstacles}'
-                ax.text(mid_x, mid_y, annotation, fontsize=8, ha='center', va='center')
+                ax.text(mid_x, mid_y, annotation, fontsize=8, ha='center', va='center', color='#FF00FF')
 
     # Set limits, labels, and title
     ax.set_xlim(-1, room.length + 1)
