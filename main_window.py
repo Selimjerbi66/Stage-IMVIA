@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QTabWidget,
     QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit, QListWidget
 )
+from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 from lab_plotting import *  # Ensure this module contains necessary functions and classes
 from connectivity import *  # Ensure this imports ConnectedCams
@@ -11,6 +12,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Simulation de caméras de surveillance")
         self.setMinimumSize(600, 900)
+        self.setWindowIcon(QIcon("cctv_1061924.png"))
         self.current_rate = 80  # Initialize the default rate
         self.setup_ui()
 
