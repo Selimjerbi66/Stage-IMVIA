@@ -397,7 +397,6 @@ hex_codes_new = [
 ]
 
 hex_codes = [
-    '#000000',  # Black (lowest intensity)
     '#00FFFF',  # Cyan
     '#00FF00',  # Green
     '#FFFF00',  # Yellow

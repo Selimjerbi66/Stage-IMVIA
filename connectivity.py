@@ -52,7 +52,7 @@ def ConnectedCams(room, cameras, d, w):
         return networks, camera_points, camera_proxi  # Return the new variable
 
     except ValueError as e:
-        print(f"ValueError: {e}")
+        #print(f"ValueError: {e}")
         return [], {}, {}
 def dist(p1, p2):
     x1, y1 = p1
@@ -81,7 +81,7 @@ def proxicharger(room, camera_proxi, camera_points, d, w):
                 q = obs(camera_points[c1], camera_points[c2], walls, room)
                 total_interference = (1 - w / 100) ** q
                 distance = dist(camera_points[c1], camera_points[c2])
-                print('distance between',c1,' and ',c2," is : ", distance)
+                #print('distance between',c1,' and ',c2," is : ", distance)
                 effective_connectivity_distance = d * total_interference
 
                 # Check the condition for connectivity

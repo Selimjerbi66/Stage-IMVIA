@@ -1,11 +1,114 @@
+import matplotlib.pyplot as plt
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QTabWidget,
-    QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit, QListWidget
+    QPushButton, QTextEdit, QLabel, QFileDialog, QLineEdit, QListWidget, QHBoxLayout
 )
+from PyQt6.QtGui import QPixmap  # Import QPixmap
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from lab_plotting import *  # Ensure this module contains necessary functions and classes
 from connectivity import *  # Ensure this imports ConnectedCams
+
+
+class PlotWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.figure, self.ax = plt.subplots()
+        self.canvas = FigureCanvas(self.figure)
+
+        # Label to display cursor coordinates
+        self.cursor_label = QLabel("Cursor Position: ")
+
+        # Layout setup
+        layout = QVBoxLayout()
+        layout.addWidget(self.canvas)
+        layout.addWidget(self.cursor_label)  # Add the label to the layout
+
+        # Create button layouts
+        button_layout1 = QHBoxLayout()
+        self.btn_up = QPushButton("Up")
+        self.btn_down = QPushButton("Down")
+        self.btn_left = QPushButton("Left")
+        self.btn_right = QPushButton("Right")
+
+        # Connect buttons to their functions
+        self.btn_up.clicked.connect(lambda: self.pan(0, 10))  # Move up
+        self.btn_down.clicked.connect(lambda: self.pan(0, -10))  # Move down
+        self.btn_left.clicked.connect(lambda: self.pan(-10, 0))  # Move left
+        self.btn_right.clicked.connect(lambda: self.pan(10, 0))  # Move right
+
+        # Add first row of buttons
+        button_layout1.addWidget(self.btn_up)
+        button_layout1.addWidget(self.btn_down)
+        button_layout1.addWidget(self.btn_left)
+        button_layout1.addWidget(self.btn_right)
+
+        # Create second row of buttons
+        button_layout2 = QHBoxLayout()
+        self.btn_zoom_in = QPushButton("Zoom In")
+        self.btn_zoom_out = QPushButton("Zoom Out")
+
+        # Connect second row buttons to their functions
+        self.btn_zoom_in.clicked.connect(self.zoom_in)
+        self.btn_zoom_out.clicked.connect(self.zoom_out)
+
+        # Add second row of buttons
+        button_layout2.addWidget(self.btn_zoom_in)
+        button_layout2.addWidget(self.btn_zoom_out)
+
+        # Add button layouts to the main layout
+        layout.addLayout(button_layout1)  # First row of buttons
+        layout.addLayout(button_layout2)  # Second row of buttons
+        self.setLayout(layout)
+
+        # Initial limits for the plot
+        self.original_xlim = None
+        self.original_ylim = None
+
+        # Connect the motion event
+        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+
+    def plot(self, x, y, title, xlabel, ylabel):
+        self.ax.clear()
+        self.ax.plot(x, y)
+        self.ax.set_title(title)
+        self.ax.set_xlabel(xlabel)
+        self.ax.set_ylabel(ylabel)
+        self.canvas.draw()
+
+        # Extract original limits after plotting
+        self.original_xlim = self.ax.get_xlim()
+        self.original_ylim = self.ax.get_ylim()
+
+    def on_mouse_move(self, event):
+        """Update cursor label with current coordinates."""
+        if event.inaxes:  # Check if the mouse is within the axes
+            x, y = event.xdata, event.ydata  # Get the coordinates
+            self.cursor_label.setText(f"Cursor Position: ({x:.2f}, {y:.2f})")
+
+    def zoom_in(self):
+        """Zoom in on the plot."""
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+        self.ax.set_xlim([xlim[0] * 0.9, xlim[1] * 0.9])
+        self.ax.set_ylim([ylim[0] * 0.9, ylim[1] * 0.9])
+        self.canvas.draw()
+
+    def zoom_out(self):
+        """Zoom out on the plot."""
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+        self.ax.set_xlim([xlim[0] * 1.1, xlim[1] * 1.1])
+        self.ax.set_ylim([ylim[0] * 1.1, ylim[1] * 1.1])
+        self.canvas.draw()
+
+    def pan(self, dx, dy):
+        """Pan the plot in the specified direction."""
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+        self.ax.set_xlim([xlim[0] + dx, xlim[1] + dx])
+        self.ax.set_ylim([ylim[0] + dy, ylim[1] + dy])
+        self.canvas.draw()
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -43,8 +146,41 @@ class MainWindow(QWidget):
 
     def setup_tab_menu(self):
         layout = QVBoxLayout()
-        ip_label = QLabel("🔗 Camera Network Simulator inside a Building")
+
+
+        ip_label = QLabel("🔗 Camera Network Simulator")
         layout.addWidget(ip_label)
+
+        # Add the first image
+        image_label_1 = QLabel()
+        pixmap1 = QPixmap("logo-imvia.png")  # Path to the first image
+        image_label_1.setPixmap(pixmap1)
+        image_label_1.setScaledContents(True)
+        image_label_1.setFixedSize(412, 100)  # Set size as needed
+
+        layout.addWidget(image_label_1)
+
+        # Add the second image
+        image_label_2 = QLabel()
+        pixmap2 = QPixmap("Polytech_DIJON.png")  # Path to the second image
+        image_label_2.setPixmap(pixmap2)
+        image_label_2.setScaledContents(True)
+        image_label_2.setFixedSize(321, 100)  # Set size as needed
+        layout.addWidget(image_label_2)
+
+        # Combine text into a single QLabel with HTML line breaks
+        combined_text = (
+        "Realized by: Selim Jerbi<br>"
+        "Under the tutelage of: Wahabou Abdou<br>"
+        "Project made at IMVIA<br>"
+        "As an internship for Polytech Dijon<br>"
+        "07/2025"
+    )
+        text_label = QLabel(combined_text)
+        text_label.setOpenExternalLinks(True)  # Enable HTML rendering
+        layout.addWidget(text_label)
+
+        
 
         # Buttons to load files
         room_charge = QPushButton("🏢 Load Building")
@@ -81,6 +217,15 @@ class MainWindow(QWidget):
         select_point = QPushButton("📍 Select Point")
         select_point.clicked.connect(self.selectPoint)
         layout.addWidget(select_point)
+
+        # Create the plot widget and add it to the layout
+        self.plot_widget = PlotWidget()
+        layout.addWidget(self.plot_widget)
+
+        # Add this in the setup_tab_view method
+        save_plot_button = QPushButton("💾 Save Plot")
+        save_plot_button.clicked.connect(self.savePlot)
+        layout.addWidget(save_plot_button)
 
         w = QWidget()
         w.setLayout(layout)
@@ -122,20 +267,24 @@ class MainWindow(QWidget):
         layout.addWidget(QLabel("Obstacle Interference (%)"))
         layout.addWidget(self.obstacle_interference_input)
 
-        # Button for connectivity check
-        connectivity_check_button = QPushButton("🔍 Connectivity Check")
-        connectivity_check_button.clicked.connect(self.checkConnectivity)
-        layout.addWidget(connectivity_check_button)
+        # Button for Connectivity Network
+        connectivity_network_button = QPushButton("🌐 Connectivity Network")
+        connectivity_network_button.clicked.connect(self.connectivityNetwork)
+        layout.addWidget(connectivity_network_button)
 
         # List to display networks
         self.network_list = QListWidget()
         self.network_list.itemClicked.connect(self.showNetworkData)
         layout.addWidget(self.network_list)
 
-        # Button to plot connectivity
-        plot_connectivity_button = QPushButton("🗺️ Plot Connectivity")
-        plot_connectivity_button.clicked.connect(self.plotConnectivity)
-        layout.addWidget(plot_connectivity_button)
+        # Create the plot network widget and add it to the layout
+        self.plot_network_widget = PlotWidget()
+        layout.addWidget(self.plot_network_widget)
+
+        # Save network plot button
+        save_network_plot_button = QPushButton("💾 Save Network Plot")
+        save_network_plot_button.clicked.connect(self.saveNetworkPlot)
+        layout.addWidget(save_network_plot_button)
 
         w = QWidget()
         w.setLayout(layout)
@@ -256,7 +405,6 @@ class MainWindow(QWidget):
             x, y = int(x_str), int(y_str)
 
             point = (x, y)  # Create the point tuple
-            self.console.append(f"Selected point: {point}")
             if point in self.viewable:
                 self.console.append(f"Point {point} data: {self.viewable[point]}")
             else:
@@ -268,13 +416,45 @@ class MainWindow(QWidget):
 
     def plotLab(self):
         try:
-            plotLab(self.room, self.cameras, self.viewable)
+            self.plot_widget.ax.clear()  # Clear the existing plot
+            plotLab(self.room, self.cameras, self.viewable, self.plot_widget.ax)  # Call the imported plotLab function
+            self.plot_widget.canvas.draw()  # Refresh the canvas to show the updated plot
+            plt.close()  # Close the figure to free resources
         except Exception as e:
             self.console.append(f"Error plotting lab: {e}")
 
     def plotConnectivity(self):
         try:
-            # Call the plotConnectivity function with the room, camera points, and camera proxi
-            plotConnectivity(self.room, self.camera_coordinates, self.camera_proxi)
+            self.plot_network_widget.ax.clear()  # Clear the existing plot
+            plotConnectivity(self.room, self.camera_coordinates, self.camera_proxi, self.plot_network_widget.ax)  # Call the imported plotConnectivity function
+            self.plot_network_widget.canvas.draw()  # Refresh the canvas to show the updated plot
+            plt.close()  # Close the figure to free resources
         except Exception as e:
             self.console.append(f"Error plotting connectivity: {e}")
+    def connectivityNetwork(self):
+        try:
+            # First, perform the connectivity check
+            self.checkConnectivity()  # Call the existing method
+
+            # Then, plot the connectivity
+            self.plotConnectivity()  # Call the existing method
+        except Exception as e:
+            self.console.append(f"Error during connectivity check and plotting: {e}")
+
+    def savePlot(self):
+        try:
+            file_path, _ = QFileDialog.getSaveFileName(self, "Save Plot", "", "PNG Files (*.png);;JPEG Files (*.jpg);;All Files (*)")
+            if file_path:
+                self.plot_widget.figure.savefig(file_path)  # Save the actual plot
+                self.console.append(f"Plot saved to: {file_path}")
+        except Exception as e:
+            self.console.append(f"Error saving plot: {e}")
+
+    def saveNetworkPlot(self):
+        try:
+            file_path, _ = QFileDialog.getSaveFileName(self, "Save Network Plot", "", "PNG Files (*.png);;JPEG Files (*.jpg);;All Files (*)")
+            if file_path:
+                self.plot_network_widget.figure.savefig(file_path)  # Save the actual network plot
+                self.console.append(f"Network plot saved to: {file_path}")
+        except Exception as e:
+            self.console.append(f"Error saving network plot: {e}")
