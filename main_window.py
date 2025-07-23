@@ -8,6 +8,7 @@ from PyQt6.QtGui import QIcon
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from lab_plotting import *  # Ensure this module contains necessary functions and classes
 from connectivity import *  # Ensure this imports ConnectedCams
+from briefing import *
 
 
 class PlotWidget(QWidget):
@@ -117,6 +118,8 @@ class MainWindow(QWidget):
         self.setMinimumSize(600, 900)
         self.setWindowIcon(QIcon("cctv_1061924.png"))
         self.current_rate = 80  # Initialize the default rate
+        self.max_distance = 250
+        self.obstacle_interference=10
         self.setup_ui()
 
     def setup_ui(self):
@@ -128,11 +131,13 @@ class MainWindow(QWidget):
         self.tab_view = self.setup_tab_view()
         self.tab_zones = self.setup_tab_zones()
         self.tab_network = self.setup_tab_network()
+        self.tab_brief = self.setup_tab_brief()  # New Brief tab
 
         self.tabs.addTab(self.tab_menu, "🏁 Menu")
         self.tabs.addTab(self.tab_view, "👁️ View")
         self.tabs.addTab(self.tab_zones, "🗺️ Zones")
         self.tabs.addTab(self.tab_network, "🌐 Network")
+        self.tabs.addTab(self.tab_brief, "🌐 Brief")
 
         layout.addWidget(self.tabs)
 
@@ -290,22 +295,93 @@ class MainWindow(QWidget):
         w.setLayout(layout)
         return w
 
-    def checkConnectivity(self):
+    def setup_tab_brief(self):
+        """Setup the Brief tab with a button and result display."""
+        layout = QVBoxLayout()
+
+        brief_start_button = QPushButton("🔍 Brief Start")
+        brief_start_button.clicked.connect(self.show_brief_results)  # Connect to the result function
+        layout.addWidget(brief_start_button)
+
+        # Result labels to display the results
+        self.results_labels = [QLabel() for _ in range(4)]
+        for label in self.results_labels:
+            layout.addWidget(label)
+
+        w = QWidget()
+        w.setLayout(layout)
+        return w
+
+    def show_brief_results(self):
+        """Calculate and display the results using the imported functions."""
         try:
-            # Retrieve inputs
-            max_distance = int(self.connectivity_distance_input.text())
-            obstacle_interference = int(self.obstacle_interference_input.text())
+            total_points = self.room.points  # Assuming self.room has a points attribute
+        except Exception as e:
+            self.results_labels[0].setText(f"Error in total points: {e}")
+        else:
+            try:
+                points = list(self.viewable.keys())  # Assuming self.viewable is a dict
+                coverage = visual_coverage(total_points, points)
+                self.results_labels[0].setText(f"Visual Coverage: {coverage:.2f}%")
+            except Exception as e:
+                self.results_labels[0].setText(f"Error calculating coverage: {e}")
+
+        try:
+            redundancy_values = list(self.viewable.values())  # Assuming self.viewable.values() is a list
+            red = redundancy(redundancy_values)
+            self.results_labels[1].setText(f"Redundancy: {red:.2f}%")
+        except Exception as e:
+            self.results_labels[1].setText(f"Error calculating redundancy: {e}")
+
+        try:
+            zone_avg = zonepercent(self.data.values())
+            self.results_labels[2].setText(f"Zone Average: {zone_avg:.2f}%")
+        except Exception as e:
+            self.results_labels[2].setText(f"Error calculating zone average: {e}")
+
+        try:
+            network_count = networks_number(self.networks)  # Assuming self.networks is a list
+            self.results_labels[3].setText(f"Number of Networks: {network_count}")
+        except Exception as e:
+            self.results_labels[3].setText(f"Error counting networks: {e}")
+
+    def devConnectivity(self):
+        """Calculate connectivity and set instance variables."""
+        try:
+            # Retrieve inputs and assign to instance variables with defaults
+            self.max_distance = int(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
+            self.obstacle_interference = int(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
 
             # Call ConnectedCams function
             self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
-                self.room, self.cameras, max_distance, obstacle_interference)
+                self.room, self.cameras, self.max_distance, self.obstacle_interference)
 
-            # Populate the network list
+            self.console.append("Connectivity calculation completed.")
+
+        except ValueError:
+            self.console.append("Error: Please enter valid integers for distance and interference.")
+        except Exception as e:
+            self.console.append(f"Error during connectivity calculation: {e}")
+
+    def checkConnectivity(self):
+        """Calculate connectivity and populate the network list with the current connectivity data."""
+        try:
+            # Retrieve inputs and assign to instance variables with defaults
+            self.max_distance = int(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
+            self.obstacle_interference = int(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
+
+            # Call ConnectedCams function
+            self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
+                self.room, self.cameras, self.max_distance, self.obstacle_interference)
+
+            self.console.append("Connectivity calculation completed.")
+
+            # Populate the network list with the current connectivity data
             self.network_list.clear()
-            for i, network in enumerate(self.networks):
+            for i, _ in enumerate(self.networks):
                 self.network_list.addItem(f"Network {i + 1}")
 
-            self.console.append("Connectivity check completed.")
+            self.console.append("Network list populated.")
 
         except ValueError:
             self.console.append("Error: Please enter valid integers for distance and interference.")
@@ -376,11 +452,13 @@ class MainWindow(QWidget):
 
     def generatePointMatrix(self):
         try:
+            
+            # Generate the point matrix
             self.room = setUpLab(process_room_file(self.json_lab_path))
             self.cameras = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
             self.viewable = self.room.point_matrix(self.cameras)
             self.console.append("Point matrix generated.")
-        
+
             zones = self.room.zones
             self.data = zoneViewer(zones, self.viewable)
 
@@ -388,7 +466,11 @@ class MainWindow(QWidget):
             self.zone_list.addItems(self.data.keys())
 
             self.console.append(f"Visibility data stored in self.data: {self.data}")
-        
+
+            # Now, calculate connectivity
+            self.devConnectivity()  # Call to update networks and camera data
+
+
         except Exception as e:
             self.console.append(f"Error generating point matrix: {e}")
 
