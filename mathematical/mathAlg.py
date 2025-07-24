@@ -22,13 +22,9 @@ class Room:
     '''def area(self):
         return self.length * self.width'''
 
-    def approximate_points(self, camera):
-        point_list = []
-
+    def visible_points_by_camera(self, camera):
     # Extract camera attributes for better readability
-        camera_x = camera.x
-        camera_y = camera.y
-        camera_range = camera.range
+        camera_x, camera_y, camera_range, camera_field = camera.x, camera.y, camera.range, camera.get_field_of_view()
 
     # Calculate bounds based on camera position and range
         min_x = max(0, camera_x - camera_range)
@@ -36,33 +32,28 @@ class Room:
         min_y = max(0, camera_y - camera_range)
         max_y = min(self.width, camera_y + camera_range)
 
-    # Iterate over the range of sight within the calculated bounds
-        for x in range(min_x, max_x + 1):
-            for y in range(min_y, max_y + 1):
-                point_list.append((x, y))
-
-        return point_list
-
-
-    def visible_points_by_camera(self, camera):
-    # Use a list comprehension for better performance and readability
-        return [point for point in self.approximate_points(camera) if self.is_visible(camera, point)]
+    # Generate and filter the list of visible points within the calculated bounds
+        return [
+        (x, y) for x in range(min_x, max_x + 1)
+        for y in range(min_y, max_y + 1)
+        if self.is_visible(camera_x, camera_y, camera_range, camera_field, (x, y))
+    ]
 
 
-    def is_visible(self, camera, point):
+    def is_visible(self, camera_x, camera_y, camera_range, camera_field, point):
         x, y = point
-        distance_squared = (x - camera.x) ** 2 + (y - camera.y) ** 2
+        distance_squared = (x - camera_x) ** 2 + (y - camera_y) ** 2
 
     # Early exit if the point is out of the camera's range (using squared distance)
-        if distance_squared > camera.range ** 2:
+        if distance_squared > camera_range ** 2:
             return False
 
     # Check for intersection with walls
-        if any(self.line_intersects_rectangle(camera.x, camera.y, x, y, wall) for wall in self.walls):
+        if any(self.line_intersects_rectangle(camera_x, camera_y, x, y, wall) for wall in self.walls):
             return False
 
-        angle_to_point = self.calculate_angle(camera, point) % 360
-        left_angle, right_angle = camera.get_field_of_view()
+        angle_to_point = self.calculate_angle(camera_x, camera_y, point) % 360
+        left_angle, right_angle = camera_field
 
     # Normalize camera angles
         left_angle %= 360
@@ -75,8 +66,8 @@ class Room:
         # Handle wrap-around case
             return angle_to_point >= left_angle or angle_to_point <= right_angle
 
-    def calculate_angle(self, camera, point):
-        return math.degrees(math.atan2(point[1] - camera.y, point[0] - camera.x))
+    def calculate_angle(self, camera_x , camera_y, point):
+        return math.degrees(math.atan2(point[1] - camera_y, point[0] - camera_x))
 
     def orientation(self, p, q, r):
         """ Determine the orientation of the triplet (p, q, r).
@@ -190,11 +181,15 @@ class Room:
 
         # Use a set to avoid redundant entries
             camera_name = camera.name
+            print('visible points done', camera_name)
+
             for point in visible_points:
                 if point in matrix:
                     matrix[point]['cameras'].append(camera_name)
                 else:
                     matrix[point] = {'cameras': [camera_name]}  # Initialize with the camera name
+            print('matrix appended', camera.name)
+
 
         return matrix
     def compatibleCamera(self, camera, reject_list):
