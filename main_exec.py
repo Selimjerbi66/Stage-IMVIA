@@ -41,7 +41,9 @@ def comparator(scene_path, cams_paths_list):
         networks, _, _ = ConnectedCams(room, cameras, 250, 10)
 
         results[cam_path] = brief_results(room, viewable, data, networks)
-
+        print('')
+    print('''
+          ''')
     # Initialize variables to track the best results
     best_coverage = -1
     best_redundancy = -1
