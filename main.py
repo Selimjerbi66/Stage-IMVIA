@@ -1,7 +1,58 @@
-from main_interface import *
-from main_exec import *
 import sys
 from ast import literal_eval
+from main_interface import *
+from main_exec import *
+
+def is_cameraset(file_path):
+    """Check if the file is a cameraset.json type of file."""
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+    if "cameras" in data:
+        if isinstance(data["cameras"], list):
+            for camera in data["cameras"]:
+                if not isinstance(camera, dict) or len(camera) != 1:
+                    return False
+                for cam_props in camera.values():
+                    if not all(key in cam_props for key in ["x", "y", "orientation", "angle", "range"]):
+                        return False
+            return True
+    return False
+
+
+def is_sceneset(file_path):
+    """Check if the file is a sceneset.json type of file."""
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+    if "room" in data:
+        room = data["room"]
+        if all(key in room for key in ["length", "width", "walls"]):
+            if isinstance(room["walls"], list):
+                for wall in room["walls"]:
+                    if not isinstance(wall, dict) or len(wall) != 1:
+                        return False
+                    for wall_props in wall.values():
+                        if not all(key in wall_props for key in ["x1", "y1", "x2", "y2", "thickness"]):
+                            return False
+            # Check for optional "zones of interest"
+            if "zones of interest" in room:
+                zones = room["zones of interest"]
+                if not isinstance(zones, dict):
+                    return False
+                for zone in zones.values():
+                    if not all(key in zone for key in ["x1", "y1", "x2", "y2"]):
+                        return False
+
+            return True
+    return False
+
 
 scene = "roomexp1.json"  # Default scene for case 3
 cams = "surveillance1.json"  # Default cams for case 3
@@ -9,8 +60,8 @@ cams = "surveillance1.json"  # Default cams for case 3
 if len(sys.argv) == 1:
     interface(sys)
     sys.exit(0)
+
 if len(sys.argv) >= 5 and sys.argv[1] == '--compare':
-    # The first argument is --compare, and we need at least 4 more (scene and 2+ cameras)
     scene_path = sys.argv[2]  # The scene file
     cams_list = sys.argv[3:]  # The list of camera files
 
@@ -19,10 +70,24 @@ if len(sys.argv) >= 5 and sys.argv[1] == '--compare':
         print("Error: The scene file must be a JSON file.")
         sys.exit(1)
 
+    # Check if the scene file is valid
+    if not is_sceneset(scene_path):
+        print(f"Error: {scene_path} is not a valid sceneset file.")
+        sys.exit(1)
+
     # Check if there are at least 2 camera files
     if len(cams_list) < 2:
         print("Error: You must provide at least two camera files for comparison.")
         sys.exit(1)
+
+    # Validate each camera file
+    for cam_path in cams_list:
+        if not cam_path.endswith('.json'):
+            print(f"Error: {cam_path} must be a JSON file.")
+            sys.exit(1)
+        if not is_cameraset(cam_path):
+            print(f"Error: {cam_path} is not a valid cameraset file.")
+            sys.exit(1)
 
     # Call the compare function
     compare(scene_path, cams_list)
@@ -42,6 +107,12 @@ if len(sys.argv) > 1:
             cams_path = sys.argv[2]
             if cams_path.endswith('.json'):
                 # Case 1: Valid scene and cams file
+                if not is_sceneset(first_arg):
+                    print(f"Error: {first_arg} is not a valid sceneset file.")
+                    sys.exit(1)
+                if not is_cameraset(cams_path):
+                    print(f"Error: {cams_path} is not a valid cameraset file.")
+                    sys.exit(1)
                 executor1(first_arg, cams_path)
                 sys.exit(0)
             else:

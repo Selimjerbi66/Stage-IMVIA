@@ -94,12 +94,30 @@ def compare(scene_path, cams_paths_list):
     zone_avg_cams_str = ', '.join(best_zone_avg_cams)
     network_count_cams_str = ', '.join(best_network_count_cams)
 
-    print(f'The best camera set in terms of coverage is {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
-    print(f'The best camera set in terms of redundancy is {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
-    print(f'The best camera set in terms of zone average is {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
-    
+    # Coverage
+    if len(best_coverage_cams) == 1:
+        print(f'The best camera set in terms of coverage is {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
+    else:
+        print(f'The best camera sets in terms of coverage are {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
+
+    # Redundancy
+    if len(best_redundancy_cams) == 1:
+        print(f'The best camera set in terms of redundancy is {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
+    else:
+        print(f'The best camera sets in terms of redundancy are {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
+
+    # Zone Average
+    if len(best_zone_avg_cams) == 1:
+        print(f'The best camera set in terms of zone average is {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
+    else:
+        print(f'The best camera sets in terms of zone average are {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
+
+    # Network Count
     network_word = 'network' if best_network_count == 1 else 'networks'
-    print(f'The best camera set in terms of network count is {network_count_cams_str} with only {best_network_count} {network_word}')
+    if len(best_network_count_cams) == 1:
+        print(f'The best camera set in terms of network count is {network_count_cams_str} with only {best_network_count} {network_word}')
+    else:
+        print(f'The best camera sets in terms of network count are {network_count_cams_str} with only {best_network_count} {network_word}')
 
 def default_cam(camera_tuple):
     camera_name, x, y, orientation = camera_tuple
