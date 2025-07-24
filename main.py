@@ -3,55 +3,7 @@ from ast import literal_eval
 from main_interface import *
 from main_exec import *
 
-def is_cameraset(file_path):
-    """Check if the file is a cameraset.json type of file."""
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return False
 
-    if "cameras" in data:
-        if isinstance(data["cameras"], list):
-            for camera in data["cameras"]:
-                if not isinstance(camera, dict) or len(camera) != 1:
-                    return False
-                for cam_props in camera.values():
-                    if not all(key in cam_props for key in ["x", "y", "orientation", "angle", "range"]):
-                        return False
-            return True
-    return False
-
-
-def is_sceneset(file_path):
-    """Check if the file is a sceneset.json type of file."""
-    try:
-        with open(file_path, 'r') as file:
-            data = json.load(file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return False
-
-    if "room" in data:
-        room = data["room"]
-        if all(key in room for key in ["length", "width", "walls"]):
-            if isinstance(room["walls"], list):
-                for wall in room["walls"]:
-                    if not isinstance(wall, dict) or len(wall) != 1:
-                        return False
-                    for wall_props in wall.values():
-                        if not all(key in wall_props for key in ["x1", "y1", "x2", "y2", "thickness"]):
-                            return False
-            # Check for optional "zones of interest"
-            if "zones of interest" in room:
-                zones = room["zones of interest"]
-                if not isinstance(zones, dict):
-                    return False
-                for zone in zones.values():
-                    if not all(key in zone for key in ["x1", "y1", "x2", "y2"]):
-                        return False
-
-            return True
-    return False
 
 
 scene = "roomexp1.json"  # Default scene for case 3
@@ -59,6 +11,37 @@ cams = "surveillance1.json"  # Default cams for case 3
 
 if len(sys.argv) == 1:
     interface(sys)
+    sys.exit(0)
+
+if len(sys.argv) == 5 and sys.argv[1] == '--compare' and sys.argv[4].isnumeric():
+    scene_path = sys.argv[2]
+    cams_path = sys.argv[3]
+
+    # Check if the scene_path is a valid sceneset file
+    if not is_sceneset(scene_path):
+        print(f"Error: {scene_path} is not a valid sceneset file.")
+        sys.exit(1)
+
+    # Check if the cams_path is a .uri file
+    if not cams_path.endswith('.uri'):
+        print(f"Error: {cams_path} is not a .uri file.")
+        sys.exit(1)
+
+    # Read camera set files
+    with open(cams_path, 'r') as file:
+        lines = [line.strip() for line in file.readlines()]
+
+    for line in lines:
+        if not line.endswith('.json'):
+            print(f"Error: {line} does not end with .json.")
+            sys.exit(1)
+        if not is_cameraset(line):
+            print(f"Error: {line} is not a valid camera set file.")
+            sys.exit(1)
+
+    # Call compare1 with the scene_path and the list of camera sets
+    index = sys.argv[4]
+    compare1(scene_path, lines, index)
     sys.exit(0)
 
 if len(sys.argv) >= 5 and sys.argv[1] == '--compare':
@@ -92,6 +75,9 @@ if len(sys.argv) >= 5 and sys.argv[1] == '--compare':
     # Call the compare function
     compare(scene_path, cams_list)
     sys.exit(0)
+
+
+
 
 if len(sys.argv) == 2 and sys.argv[1] == '--default':
     executor1(scene, cams)

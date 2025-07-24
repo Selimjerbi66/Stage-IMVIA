@@ -27,9 +27,10 @@ def executor2(scene, tuples):
     cameras = setUpCameras(normalized_cams(tuples), room)
     executor3(room, cameras)
 
-def compare(scene_path, cams_paths_list):
-    """Compare camera sets based on various metrics."""
+def comparator(scene_path, cams_paths_list):
+    """Compare camera sets and accumulate results in a string."""
     results = {}  # Initialize an empty dictionary to store results
+    output = []   # Initialize a list to store output strings
 
     for cam_path in cams_paths_list:
         room = setUpLab(process_room_file(scene_path))
@@ -39,7 +40,6 @@ def compare(scene_path, cams_paths_list):
         data = zoneViewer(zones, viewable)
         networks, _, _ = ConnectedCams(room, cameras, 250, 10)
 
-        print('')  # Print a blank line for separation
         results[cam_path] = brief_results(room, viewable, data, networks)
 
     # Initialize variables to track the best results
@@ -88,7 +88,7 @@ def compare(scene_path, cams_paths_list):
             elif network_count == best_network_count:
                 best_network_count_cams.append(cam_path)
 
-    # Print best results
+    # Append best results to output
     coverage_cams_str = ', '.join(best_coverage_cams)
     redundancy_cams_str = ', '.join(best_redundancy_cams)
     zone_avg_cams_str = ', '.join(best_zone_avg_cams)
@@ -96,28 +96,51 @@ def compare(scene_path, cams_paths_list):
 
     # Coverage
     if len(best_coverage_cams) == 1:
-        print(f'The best camera set in terms of coverage is {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
+        output.append(f'The best camera set in terms of coverage is {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
     else:
-        print(f'The best camera sets in terms of coverage are {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
+        output.append(f'The best camera sets in terms of coverage are {coverage_cams_str} with a coverage of {best_coverage:.2f}%')
 
     # Redundancy
     if len(best_redundancy_cams) == 1:
-        print(f'The best camera set in terms of redundancy is {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
+        output.append(f'The best camera set in terms of redundancy is {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
     else:
-        print(f'The best camera sets in terms of redundancy are {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
+        output.append(f'The best camera sets in terms of redundancy are {redundancy_cams_str} with a redundancy of {best_redundancy:.2f}%')
 
     # Zone Average
     if len(best_zone_avg_cams) == 1:
-        print(f'The best camera set in terms of zone average is {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
+        output.append(f'The best camera set in terms of zone average is {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
     else:
-        print(f'The best camera sets in terms of zone average are {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
+        output.append(f'The best camera sets in terms of zone average are {zone_avg_cams_str} with an average of {best_zone_avg:.2f}%')
 
     # Network Count
     network_word = 'network' if best_network_count == 1 else 'networks'
     if len(best_network_count_cams) == 1:
-        print(f'The best camera set in terms of network count is {network_count_cams_str} with only {best_network_count} {network_word}')
+        output.append(f'The best camera set in terms of network count is {network_count_cams_str} with only {best_network_count} {network_word}')
     else:
-        print(f'The best camera sets in terms of network count are {network_count_cams_str} with only {best_network_count} {network_word}')
+        output.append(f'The best camera sets in terms of network count are {network_count_cams_str} with only {best_network_count} {network_word}')
+
+    return '\n'.join(output)  # Return the accumulated output as a single string
+
+
+def compare(scene_path, cams_paths_list):
+    """Compare camera sets based on various metrics and print results."""
+    results_string = comparator(scene_path, cams_paths_list)
+    print(results_string)
+
+def compare1(scene_path, cams_paths_list, i):
+    """Generate a comparison report and write it to an output file."""
+    # Create the output file name based on the index
+    output_filename = f'output{i}.txt'
+    
+    # Get the comparison results as a string
+    results_string = comparator(scene_path, cams_paths_list)
+    
+    # Write the results to the output file
+    with open(output_filename, 'w') as output_file:
+        output_file.write(results_string)
+
+    print(f'Results written to {output_filename}')  # Optional: Notify the user
+
 
 def default_cam(camera_tuple):
     camera_name, x, y, orientation = camera_tuple
@@ -207,3 +230,54 @@ def print_brief_results(room, viewable, data, networks):
             print(f"Zone Average: {zone_avg:.2f}%")
         if network_count is not None:
             print(f"Number of Networks: {network_count}")
+
+
+def is_cameraset(file_path):
+    """Check if the file is a cameraset.json type of file."""
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+    if "cameras" in data:
+        if isinstance(data["cameras"], list):
+            for camera in data["cameras"]:
+                if not isinstance(camera, dict) or len(camera) != 1:
+                    return False
+                for cam_props in camera.values():
+                    if not all(key in cam_props for key in ["x", "y", "orientation", "angle", "range"]):
+                        return False
+            return True
+    return False
+
+
+def is_sceneset(file_path):
+    """Check if the file is a sceneset.json type of file."""
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+
+    if "room" in data:
+        room = data["room"]
+        if all(key in room for key in ["length", "width", "walls"]):
+            if isinstance(room["walls"], list):
+                for wall in room["walls"]:
+                    if not isinstance(wall, dict) or len(wall) != 1:
+                        return False
+                    for wall_props in wall.values():
+                        if not all(key in wall_props for key in ["x1", "y1", "x2", "y2", "thickness"]):
+                            return False
+            # Check for optional "zones of interest"
+            if "zones of interest" in room:
+                zones = room["zones of interest"]
+                if not isinstance(zones, dict):
+                    return False
+                for zone in zones.values():
+                    if not all(key in zone for key in ["x1", "y1", "x2", "y2"]):
+                        return False
+
+            return True
+    return False
