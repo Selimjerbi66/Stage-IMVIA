@@ -3,9 +3,6 @@ from ast import literal_eval
 from main_interface import *
 from main_exec import *
 
-
-
-
 scene = "roomexp1.json"  # Default scene for case 3
 cams = "surveillance1.json"  # Default cams for case 3
 
@@ -75,9 +72,6 @@ if len(sys.argv) >= 5 and sys.argv[1] == '--compare':
     # Call the compare function
     compare(scene_path, cams_list)
     sys.exit(0)
-
-
-
 
 if len(sys.argv) == 2 and sys.argv[1] == '--default':
     executor1(scene, cams)

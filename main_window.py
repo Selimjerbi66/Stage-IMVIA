@@ -112,10 +112,16 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self,app):
         super().__init__()
         self.setWindowTitle("Simulation de caméras de surveillance")
-        self.setMinimumSize(600, 900)
+    # Get screen size
+        screen = app.primaryScreen()
+        screen_rect = screen.geometry()
+        window_height = screen_rect.height()
+
+        # Set window size to be a fraction of the screen size
+        self.setMinimumSize(600, int(window_height * 0.9))
         self.setWindowIcon(QIcon("cctv_1061924.png"))
         self.current_rate = 80  # Initialize the default rate
         self.max_distance = 250
