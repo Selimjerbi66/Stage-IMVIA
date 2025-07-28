@@ -253,6 +253,11 @@ class MainWindow(QWidget):
         apply_rate_button.clicked.connect(self.applyRate)
         layout.addWidget(apply_rate_button)
 
+        self.zoner = QTextEdit()
+        self.zoner.setReadOnly(True)
+        self.zoner.setPlaceholderText("📜 Zone Data Lister")
+        layout.addWidget(self.zoner)
+
         w = QWidget()
         w.setLayout(layout)
         return w
@@ -407,20 +412,20 @@ class MainWindow(QWidget):
         default_rate = 80  # Default rate
 
         if not input_rate:  # If input is empty, use default rate
-            self.current_rate = default_rate
+            self.zoner.append("Invalid input: please enter a number.")
         else:
             try:
                 rate = float(input_rate)  # Convert to float
                 if 0 <= rate <= 100:  # Check if the rate is between 0 and 100
                     self.current_rate = rate
                 else:
-                    self.console.append("Rate must be between 0 and 100")
+                    self.zoner.append("Rate must be between 0 and 100")
                     return
             except ValueError:
-                self.console.append("Invalid input: please enter a number.")
+                self.zoner.append("Invalid input: please enter a number.")
                 return
-
-        self.console.append(f"Rate applied: {self.current_rate}")
+        if input_rate:
+            self.zoner.append(f"Rate applied: {self.current_rate}")
 
     def showZoneData(self, item):
         zone_name = item.text()
@@ -428,11 +433,11 @@ class MainWindow(QWidget):
             visibility_rate = self.data[zone_name] * 100
         
             if visibility_rate < self.current_rate:
-                self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone cannot be considered visible.")
+                self.zoner.append(f"{zone_name}: {visibility_rate:.2f}% - Zone cannot be considered visible.")
             else:
-                self.console.append(f"{zone_name}: {visibility_rate:.2f}% - Zone is visible.")
+                self.zoner.append(f"{zone_name}: {visibility_rate:.2f}% - Zone is visible.")
         else:
-            self.console.append(f"No data found for {zone_name}.")
+            self.zoner.append(f"No data found for {zone_name}.")
 
     def roomCharge(self):
         try:
