@@ -1,8 +1,11 @@
 def ConnectedCams(room, cameras, d, w):
     try:
         # Ensure w is less than or equal to 100
-        if w > 100:
-            raise ValueError("w must be less than or equal to 100.")
+        if w > 100 or w<0:
+            raise ValueError("the interferance per obstacle must be less than or equal to 100 and superiour to 0.")
+
+        if d<0:
+            raise ValueError("the maximum distance must be less than or equal to 100.")
 
         walls = room.walls
         camera_points = {camera.name: (camera.x, camera.y) for camera in cameras}
