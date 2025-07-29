@@ -314,10 +314,9 @@ class MainWindow(QWidget):
         brief_start_button.clicked.connect(self.show_brief_results)  # Connect to the result function
         layout.addWidget(brief_start_button)
 
-        # Result labels to display the results
-        self.results_labels = [QLabel() for _ in range(4)]
-        for label in self.results_labels:
-            layout.addWidget(label)
+        # QListWidget to display results
+        self.results_list = QListWidget()
+        layout.addWidget(self.results_list)
 
         w = QWidget()
         w.setLayout(layout)
@@ -325,36 +324,38 @@ class MainWindow(QWidget):
 
     def show_brief_results(self):
         """Calculate and display the results using the imported functions."""
+        self.results_list.clear()  # Clear previous results
+
         try:
             total_points = self.room.points  # Assuming self.room has a points attribute
         except Exception as e:
-            self.results_labels[0].setText(f"Error in total points: {e}")
+            self.results_list.addItem(f"Error in total points: {e}")
         else:
             try:
                 points = list(self.viewable.keys())  # Assuming self.viewable is a dict
                 coverage = visual_coverage(total_points, points)
-                self.results_labels[0].setText(f"Visual Coverage: {coverage:.2f}%")
+                self.results_list.addItem(f"Visual Coverage: {coverage:.2f}%")
             except Exception as e:
-                self.results_labels[0].setText(f"Error calculating coverage: {e}")
+                self.results_list.addItem(f"Error calculating coverage: {e}")
 
         try:
             redundancy_values = list(self.viewable.values())  # Assuming self.viewable.values() is a list
             red = redundancy(redundancy_values)
-            self.results_labels[1].setText(f"Redundancy: {red:.2f}%")
+            self.results_list.addItem(f"Redundancy: {red:.2f}%")
         except Exception as e:
-            self.results_labels[1].setText(f"Error calculating redundancy: {e}")
+            self.results_list.addItem(f"Error calculating redundancy: {e}")
 
         try:
             zone_avg = zonepercent(self.data.values())
-            self.results_labels[2].setText(f"Zone Average: {zone_avg:.2f}%")
+            self.results_list.addItem(f"Zone Average: {zone_avg:.2f}%")
         except Exception as e:
-            self.results_labels[2].setText(f"Error calculating zone average: {e}")
+            self.results_list.addItem(f"Error calculating zone average: {e}")
 
         try:
             network_count = networks_number(self.networks)  # Assuming self.networks is a list
-            self.results_labels[3].setText(f"Number of Networks: {network_count}")
+            self.results_list.addItem(f"Number of Networks: {network_count}")
         except Exception as e:
-            self.results_labels[3].setText(f"Error counting networks: {e}")
+                self.results_list.addItem(f"Error counting networks: {e}")
 
     def devConnectivity(self):
         """Calculate connectivity and set instance variables."""
