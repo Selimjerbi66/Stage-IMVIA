@@ -193,15 +193,16 @@ class Room:
 
         return matrix
     def compatibleCamera(self, camera, reject_list):
+        camera_x , camera_y, camera_name = camera.x, camera.y, camera.name
     # Check if the camera is within the room dimensions
-        if not (0 <= camera.x <= self.length and 0 <= camera.y <= self.width):
-            reject_list.append(camera)
+        if not (0 <= camera_x <= self.length and 0 <= camera_y <= self.width):
+            reject_list.append(camera_name)
             return False, reject_list
     
     # Check if the camera is on any wall
         for wall in self.walls:
-            if wall.point_on_rectangle(camera.x, camera.y):
-                reject_list.append(camera)
+            if wall.point_on_rectangle(camera_x, camera_y):
+                reject_list.append(camera_name)
                 return False, reject_list
 
         return True, reject_list

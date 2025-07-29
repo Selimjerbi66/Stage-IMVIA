@@ -368,8 +368,6 @@ class MainWindow(QWidget):
             self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
                 self.room, self.cameras, self.max_distance, self.obstacle_interference)
 
-            self.console.append("Connectivity calculation completed.")
-
         except ValueError:
             self.console.append("Error: Please enter valid integers for distance and interference.")
         except Exception as e:
@@ -379,8 +377,8 @@ class MainWindow(QWidget):
         """Calculate connectivity and populate the network list with the current connectivity data."""
         try:
             # Retrieve inputs and assign to instance variables with defaults
-            self.max_distance = int(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
-            self.obstacle_interference = int(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
+            self.max_distance = float(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
+            self.obstacle_interference = float(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
 
             # Call ConnectedCams function
             self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
@@ -464,20 +462,18 @@ class MainWindow(QWidget):
 
     def generatePointMatrix(self):
         try:
-            
+            self.rejected_list=[]
             # Generate the point matrix
             self.room = setUpLab(process_room_file(self.json_lab_path))
-            self.cameras = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
+            self.cameras, self.rejected_list = setUpCameras(process_cameras_file(self.json_cam_path), self.room)
             self.viewable = self.room.point_matrix(self.cameras)
             self.console.append("Point matrix generated.")
-
+            self.console.append(f"The cameras rejected are: {self.rejected_list}") if self.rejected_list else None
             zones = self.room.zones
             self.data = zoneViewer(zones, self.viewable)
 
             self.zone_list.clear()
             self.zone_list.addItems(self.data.keys())
-
-            self.console.append(f"Visibility data stored in self.data: {self.data}")
 
             # Now, calculate connectivity
             self.devConnectivity()  # Call to update networks and camera data

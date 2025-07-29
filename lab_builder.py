@@ -23,7 +23,7 @@ def setUpCameras(matrix, Room):
         print("here is the list of rejected cameras due to their positions")
     for i in rejected_list:
         print(i.name, ' : (', i.x,',',i.y,')')'''
-    return Cameras
+    return Cameras, rejected_list
 
 '''
 json_file_path = "labo.json"  # Replace with your JSON file path
