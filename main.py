@@ -10,9 +10,9 @@ if len(sys.argv) == 1:
     interface(sys)
     sys.exit(0)
 
-if len(sys.argv) == 5 and sys.argv[1] == '--compare' and sys.argv[4].isnumeric():
-    scene_path = sys.argv[2]
-    cams_path = sys.argv[3]
+if len(sys.argv) == 5 and sys.argv[1] == '--compare' and sys.argv[2].isnumeric():
+    scene_path = sys.argv[3]
+    cams_path = sys.argv[4]
 
     # Check if the scene_path is a valid sceneset file
     if not is_sceneset(scene_path):
@@ -37,7 +37,7 @@ if len(sys.argv) == 5 and sys.argv[1] == '--compare' and sys.argv[4].isnumeric()
             sys.exit(1)
 
     # Call compare1 with the scene_path and the list of camera sets
-    index = sys.argv[4]
+    index = sys.argv[2]
     compare1(scene_path, lines, index)
     sys.exit(0)
 
@@ -112,22 +112,41 @@ if len(sys.argv) > 1:
                 executor2(first_arg, tuples)
                 sys.exit(0)
 
+
         # If there are more than two arguments, check for tuples
-        elif len(sys.argv) > 3:
-            tuples = []
-            for arg in sys.argv[2:]:
-                try:
-                    parsed_tuple = literal_eval(arg)
-                    if isinstance(parsed_tuple, tuple):
-                        tuples.append(parsed_tuple)
-                    else:
-                        raise ValueError(f"{arg} is not a valid tuple.")
-                except (ValueError, SyntaxError):
-                    print(f"Error: {arg} is not a valid tuple format.")
-                    sys.exit(1)
-            # Execute with scene file and list of tuples
-            executor2(first_arg, tuples)
-            sys.exit(0)
+        elif len(sys.argv) >= 3:
+
+            if sys.argv[2].isnumeric():
+                index = sys.argv[2]
+                tuples = []
+                for arg in sys.argv[3:]:
+                    try:
+                        parsed_tuple = literal_eval(arg)
+                        if isinstance(parsed_tuple, tuple):
+                            tuples.append(parsed_tuple)
+                        else:
+                            raise ValueError(f"{arg} is not a valid tuple.")
+                    except (ValueError, SyntaxError):
+                        print(f"Error: {arg} is not a valid tuple format.")
+                        sys.exit(1)
+                # Execute with scene file and list of tuples
+                executor_index(scene, tuples, index)
+                sys.exit(0)
+            else:
+                tuples = []
+                for arg in sys.argv[2:]:
+                    try:
+                        parsed_tuple = literal_eval(arg)
+                        if isinstance(parsed_tuple, tuple):
+                            tuples.append(parsed_tuple)
+                        else:
+                            raise ValueError(f"{arg} is not a valid tuple.")
+                    except (ValueError, SyntaxError):
+                        print(f"Error: {arg} is not a valid tuple format.")
+                        sys.exit(1)
+                # Execute with scene file and list of tuples
+                executor2(first_arg, tuples)
+                sys.exit(0)
 
     else:
         # Check if all arguments are tuples for case 3

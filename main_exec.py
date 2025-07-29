@@ -8,24 +8,33 @@ def executor3 (room, cameras):
     zones = room.zones
     data = zoneViewer(zones, viewable)
     networks, _, _ = ConnectedCams(room, cameras, 250, 10)
-    print('''
-''')
-    print_brief_results(room, viewable, data, networks)
+    return viewable, data, networks
 
+def executor_index(scene, tuples, index):
+    print(scene," and ", tuples)
+    room = setUpLab(process_room_file(scene))
+    cameras = setUpCameras(normalized_cams(tuples), room)
+    viewable, data, networks =executor3(room, cameras)
+    save_brief_results(room, viewable, data, networks, index)
 
 def executor1(scene_path, cams_path):
     print(scene_path," and", cams_path)
-
     room = setUpLab(process_room_file(scene_path))
     cameras = setUpCameras(process_cameras_file(cams_path), room)
-    executor3(room, cameras)
+    viewable, data, networks =executor3(room, cameras)
+    print('''
+''')
+    print_brief_results(room, viewable, data, networks)
 
 
 def executor2(scene, tuples):
     print(scene," and ", tuples)
     room = setUpLab(process_room_file(scene))
     cameras = setUpCameras(normalized_cams(tuples), room)
-    executor3(room, cameras)
+    viewable, data, networks =executor3(room, cameras)
+    print('''
+''')
+    print_brief_results(room, viewable, data, networks)
 
 def comparator(scene_path, cams_paths_list):
     """Compare camera sets and accumulate results in a string."""
@@ -217,21 +226,42 @@ def brief_results(room, viewable, data, networks):
     return (coverage, red, zone_avg, network_count)  # Return results as a tuple
 
 
-def print_brief_results(room, viewable, data, networks):
-    """Call brief_results and print the results."""
+def prepare_brief_results(room, viewable, data, networks):
+    """Prepare the results text for printing."""
     results = brief_results(room, viewable, data, networks)
-
+    
     if results is not None:
         coverage, red, zone_avg, network_count = results
+        output = []
         
         if coverage is not None:
-            print(f"Visual Coverage: {coverage:.2f}%")
+            output.append(f"Visual Coverage: {coverage:.2f}%")
         if red is not None:
-            print(f"Redundancy: {red:.2f}%")
+            output.append(f"Redundancy: {red:.2f}%")
         if zone_avg is not None:
-            print(f"Zone Average: {zone_avg:.2f}%")
+            output.append(f"Zone Average: {zone_avg:.2f}%")
         if network_count is not None:
-            print(f"Number of Networks: {network_count}")
+            output.append(f"Number of Networks: {network_count}")
+        
+        return "\n".join(output)
+    
+    return None
+
+def print_brief_results(room, viewable, data, networks):
+    """Print the brief results."""
+    results_text = prepare_brief_results(room, viewable, data, networks)
+
+    if results_text is not None:
+        print(results_text)
+
+def save_brief_results(room, viewable, data, networks, index):
+    """Save the brief results to a file."""
+    results_text = prepare_brief_results(room, viewable, data, networks)
+
+    if results_text is not None:
+        filename = f"output{index}.txt"
+        with open(filename, 'w') as file:
+            file.write(results_text)
 
 
 def is_cameraset(file_path):
