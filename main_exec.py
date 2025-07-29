@@ -132,7 +132,7 @@ def compare(scene_path, cams_paths_list):
 def compare1(scene_path, cams_paths_list, i):
     """Generate a comparison report and write it to an output file."""
     # Create the output file name based on the index
-    output_filename = f'output{i}.txt'
+    output_filename = f'compare{i}.txt'
     
     # Get the comparison results as a string
     results_string = comparator(scene_path, cams_paths_list)

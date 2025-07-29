@@ -188,7 +188,7 @@ class Room:
                     matrix[point]['cameras'].append(camera_name)
                 else:
                     matrix[point] = {'cameras': [camera_name]}  # Initialize with the camera name
-            print('matrix appended', camera.name)
+            print('matrix appended', camera_name)
 
 
         return matrix
