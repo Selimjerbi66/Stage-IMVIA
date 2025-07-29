@@ -13,14 +13,14 @@ def executor3 (room, cameras):
 def executor_index(scene, tuples, index):
     print(scene," and ", tuples)
     room = setUpLab(process_room_file(scene))
-    cameras = setUpCameras(normalized_cams(tuples), room)
+    cameras, _ = setUpCameras(normalized_cams(tuples), room)
     viewable, data, networks =executor3(room, cameras)
     save_brief_results(room, viewable, data, networks, index)
 
 def executor1(scene_path, cams_path):
     print(scene_path," and", cams_path)
     room = setUpLab(process_room_file(scene_path))
-    cameras = setUpCameras(process_cameras_file(cams_path), room)
+    cameras, _ = setUpCameras(process_cameras_file(cams_path), room)
     viewable, data, networks =executor3(room, cameras)
     print('''
 ''')
@@ -30,7 +30,7 @@ def executor1(scene_path, cams_path):
 def executor2(scene, tuples):
     print(scene," and ", tuples)
     room = setUpLab(process_room_file(scene))
-    cameras = setUpCameras(normalized_cams(tuples), room)
+    cameras, _ = setUpCameras(normalized_cams(tuples), room)
     viewable, data, networks =executor3(room, cameras)
     print('''
 ''')
@@ -43,7 +43,7 @@ def comparator(scene_path, cams_paths_list):
 
     for cam_path in cams_paths_list:
         room = setUpLab(process_room_file(scene_path))
-        cameras = setUpCameras(process_cameras_file(cam_path), room)
+        cameras, _ = setUpCameras(process_cameras_file(cam_path), room)
         viewable = room.point_matrix(cameras)
         zones = room.zones
         data = zoneViewer(zones, viewable)

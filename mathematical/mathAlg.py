@@ -304,7 +304,6 @@ class Camera:
         self.name = name
         self.x = x
         self.y = y
-        self.pos = (x,y)
         self.orientation = orientation
         self.angle_of_sight = angle_of_sight
         self.range = range
