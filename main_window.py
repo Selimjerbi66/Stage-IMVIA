@@ -280,7 +280,7 @@ class MainWindow(QWidget):
         # Input for obstacle interference
         self.obstacle_interference_input = QLineEdit()
         self.obstacle_interference_input.setPlaceholderText("exp : 10")
-        layout.addWidget(QLabel("Obstacle Interference (%)"))
+        layout.addWidget(QLabel("Obstacle Attenuation Rate (%)"))
         layout.addWidget(self.obstacle_interference_input)
 
         # Button for Connectivity Network
@@ -361,15 +361,15 @@ class MainWindow(QWidget):
         """Calculate connectivity and set instance variables."""
         try:
             # Retrieve inputs and assign to instance variables with defaults
-            self.max_distance = int(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
-            self.obstacle_interference = int(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
+            self.max_distance = float(self.connectivity_distance_input.text()) if self.connectivity_distance_input.text() else 250
+            self.obstacle_interference = float(self.obstacle_interference_input.text()) if self.obstacle_interference_input.text() else 10
 
             # Call ConnectedCams function
             self.networks, self.camera_coordinates, self.camera_proxi = ConnectedCams(
                 self.room, self.cameras, self.max_distance, self.obstacle_interference)
 
         except ValueError:
-            self.console.append("Error: Please enter valid integers for distance and interference.")
+            self.console.append("Error")
         except Exception as e:
             self.console.append(f"Error during connectivity calculation: {e}")
 
